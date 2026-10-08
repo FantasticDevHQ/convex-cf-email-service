@@ -8,9 +8,8 @@
  * @module
  */
 
-import type * as credentialContract from "../credentialContract.js";
 import type * as email from "../email.js";
-import type * as smoke from "../smoke.js";
+import type * as http from "../http.js";
 
 import type {
   ApiFromModules,
@@ -19,9 +18,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  credentialContract: typeof credentialContract;
   email: typeof email;
-  smoke: typeof smoke;
+  http: typeof http;
 }>;
 
 /**
@@ -51,5 +49,6 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  cloudflareEmail: import("@ezyyeah/cloudflare-email-sending/_generated/component.js").ComponentApi<"cloudflareEmail">;
+  transactionalEmail: import("@fantastic.dev/convex-cf-email-service/_generated/component.js").ComponentApi<"transactionalEmail">;
+  authEmail: import("@fantastic.dev/convex-cf-email-service/_generated/component.js").ComponentApi<"authEmail">;
 };

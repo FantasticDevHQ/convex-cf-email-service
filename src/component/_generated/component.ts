@@ -23,59 +23,147 @@ import type { FunctionReference } from "convex/server";
  */
 export type ComponentApi<Name extends string | undefined = string | undefined> =
   {
-    actions: {
-      send: FunctionReference<
-        "action",
+    email: {
+      attachMessageId: FunctionReference<
+        "mutation",
         "internal",
-        {
-          config: {
-            accountId: string;
-            apiBaseUrl: string;
-            apiToken: string;
-            initialBackoffMs: number;
-            maxAttempts: number;
-            maxBackoffMs: number;
-          };
-          request: {
-            attachments?: Array<{
-              content: string;
-              contentId?: string;
-              disposition?: "attachment" | "inline";
-              filename: string;
-              type?: string;
-            }>;
-            bcc?: string | Array<string>;
-            cc?: string | Array<string>;
-            from: string | { address: string; name?: string };
-            headers?: Record<string, string>;
-            html?: string;
-            idempotencyKey?: string;
-            metadata?: Record<string, string>;
-            replyTo?: string | { address: string; name?: string };
-            subject: string;
-            text?: string;
-            to: string | Array<string>;
-          };
-        },
-        any,
+        { id: string; messageId: string; recipient: string },
+        null,
         Name
       >;
-    };
-    mutations: {
       cancel: FunctionReference<
         "mutation",
         "internal",
-        { emailId: string },
-        any,
+        { id: string },
+        boolean,
         Name
       >;
-    };
-    queries: {
-      getStatus: FunctionReference<
+      clearSuppression: FunctionReference<
+        "mutation",
+        "internal",
+        { recipient: string; scope: string },
+        boolean,
+        Name
+      >;
+      enqueue: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          dedupDays?: number;
+          expiresAt: number;
+          handle: string;
+          key: string;
+          maxAttempts?: number;
+          metadataDays?: number;
+          payload: {
+            attachments?: Array<{
+              content: string;
+              contentId?: string;
+              disposition: "attachment" | "inline";
+              filename: string;
+              type: string;
+            }>;
+            bcc?: Array<string>;
+            cc?: Array<string>;
+            from: string;
+            headers?: Record<string, string>;
+            html?: string;
+            replyTo?: string;
+            subject: string;
+            text?: string;
+            to: Array<string>;
+          };
+          scope: string;
+          transport: string;
+        },
+        string,
+        Name
+      >;
+      ingest: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          event: {
+            at: number;
+            eventId: string;
+            kind:
+              | "queued"
+              | "accepted"
+              | "delivered"
+              | "deferred"
+              | "bounced"
+              | "failed"
+              | "rejected"
+              | "complained";
+            messageId: string;
+            permanent: boolean;
+            recipient: string;
+          };
+          scope: string;
+        },
+        "duplicate" | "pending" | "applied",
+        Name
+      >;
+      metrics: FunctionReference<
         "query",
         "internal",
-        { emailId: string },
-        any,
+        { scope: string; since: number },
+        Array<{ count: number; day: number; name: string }>,
+        Name
+      >;
+      reconcile: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          attempt: number;
+          decision:
+            | {
+                kind: "accepted";
+                recipients: Array<{
+                  messageId?: string;
+                  recipient: string;
+                  status: "accepted" | "delivered" | "bounced";
+                }>;
+              }
+            | { kind: "not_sent" }
+            | { kind: "abandon" };
+          id: string;
+        },
+        null,
+        Name
+      >;
+      status: FunctionReference<
+        "query",
+        "internal",
+        { id: string },
+        null | {
+          attempt: number;
+          cancelRequested: boolean;
+          createdAt: number;
+          delivery: Array<{
+            count: number;
+            state:
+              | "queued"
+              | "accepted"
+              | "delivered"
+              | "deferred"
+              | "bounced"
+              | "failed"
+              | "rejected"
+              | "complained";
+          }>;
+          expiresAt: number;
+          state:
+            | "queued"
+            | "sending"
+            | "retrying"
+            | "accepted"
+            | "ambiguous"
+            | "cancelled"
+            | "expired"
+            | "failed"
+            | "suppressed";
+        },
         Name
       >;
     };

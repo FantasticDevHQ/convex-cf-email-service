@@ -1,34 +1,17 @@
-# React + Next.js Example
+# Host and Worker examples
 
-This example is a small React app built with Next.js and Convex.
+`convex/` mounts separate transactional and auth email components. Receipt enqueue
+writes a host-owned order record atomically, and an internal host REST action resolves
+the current token. `http.ts` verifies signed event bytes, pins the store scope and
+commits ingestion before returning success. The host controls all auth, schema and
+template logic. The internal receipt helper is not a public API.
 
-It does not use a plain `index.html` entrypoint. The app lives in the Next.js
-`app/` directory and uses the App Router.
+`worker/` uses the native EMAIL binding for signed send requests and consumes delivery
+Queue messages. The host workerTransport action resolves its bridge secret per call.
+Do not retry a lost send response; reconcile ambiguity. Use different credentials for
+sending and delivery-event forwarding. The config contains placeholders and five
+Queue retries plus a DLQ. These files are typechecked but not deployed.
 
-## Stack
-
-- React
-- Next.js App Router
-- Convex React client
-- local Convex backend in [`convex`](./convex)
-
-## Run
-
-From the repository root:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-That starts:
-
-- the React + Next.js frontend at [http://127.0.0.1:3000](http://127.0.0.1:3000)
-- the local Convex backend
-
-## Files
-
-- [`app/page.tsx`](./app/page.tsx): server entry for the page
-- [`app/ui/example-client.tsx`](./app/ui/example-client.tsx): main client-side React UI
-- [`app/globals.css`](./app/globals.css): styling
-- [`convex/smoke.ts`](./convex/smoke.ts): example Convex actions using the component
+Read ../docs/events.md before separately authorized domain, Queue, subscription,
+secret and infrastructure setup. Replace scope/source/endpoint mapping in host code
+for your app; do not expose source configuration or callback handles to browsers.

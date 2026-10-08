@@ -1,7 +1,7 @@
 {
-  "name": "@ezyyeah/cloudflare-email-sending",
+  "name": "@fantastic.dev/convex-cf-email-service",
   "version": "0.1.0",
-  "description": "A Convex component for durable transactional email sending through Cloudflare Email Service.",
+  "description": "Reusable Convex email intent, host-owned Cloudflare transport and delivery tracking.",
   "license": "Apache-2.0",
   "keywords": [
     "convex",
@@ -11,21 +11,25 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "pnpm --dir example dev",
-    "dev:example": "pnpm --dir example dev",
-    "build": "tsc --project ./tsconfig.build.json",
-    "build:codegen": "npx convex dev --once --codegen disable --typecheck disable --tail-logs disable --start 'sh -lc \"npx convex codegen --typecheck disable --component-dir ./src/component && npx convex codegen --typecheck disable && npm run build\"'",
-    "build:clean": "rm -rf dist *.tsbuildinfo && npm run build:codegen",
-    "prepack": "npm run build",
-    "typecheck": "tsc --noEmit && pnpm --dir example typecheck",
-    "test": "npm run typecheck && vitest run --typecheck"
+    "build": "node scripts/build.mjs",
+    "prepack": "pnpm run build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p example/convex && tsc --noEmit -p example/worker",
+    "test": "vitest run",
+    "check": "pnpm run build && pnpm run typecheck && pnpm run test && node --test scripts/release-notes.test.mjs && node scripts/check-package.mjs && node scripts/check-readme-samples.mjs && node scripts/check-codegen-fresh.mjs",
+    "check:consumer": "node scripts/clean-consumer.mjs",
+    "codegen": "convex codegen --component-dir src/component",
+    "format": "prettier --write src example scripts README.md docs package.json tsconfig*.json vitest*.ts"
   },
   "files": [
     "dist",
     "src",
     "!src/**/*.test.ts",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE",
+    "UPSTREAM.md",
+    "docs",
+    "CHANGELOG.md"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -47,41 +51,55 @@
     "./convex.config": {
       "types": "./dist/component/convex.config.d.ts",
       "default": "./dist/component/convex.config.js"
+    },
+    "./transport": {
+      "types": "./dist/transport/index.d.ts",
+      "default": "./dist/transport/index.js"
+    },
+    "./bridge": {
+      "types": "./dist/bridge/index.d.ts",
+      "default": "./dist/bridge/index.js"
     }
   },
   "peerDependencies": {
-    "convex": "^1.35.1"
+    "convex": "^1.44.0"
   },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "provenance": true
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ezyyeah/cloudflare-email-sending.git"
+    "url": "git+https://github.com/FantasticDevHQ/convex-cf-email-service.git"
   },
-  "homepage": "https://github.com/ezyyeah/cloudflare-email-sending#readme",
+  "homepage": "https://github.com/FantasticDevHQ/convex-cf-email-service#readme",
   "bugs": {
-    "url": "https://github.com/ezyyeah/cloudflare-email-sending/issues"
+    "url": "https://github.com/FantasticDevHQ/convex-cf-email-service/issues"
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=18"
+    "node": ">=24.19.0"
   },
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@11.18.0",
   "dependencies": {
-    "@convex-dev/workpool": "^0.4.6"
+    "@noble/hashes": "2.4.0"
   },
   "devDependencies": {
-    "@edge-runtime/vm": "^5.0.0",
-    "@types/node": "^24.12.2",
-    "chokidar-cli": "^3.0.0",
-    "convex": "1.35.1",
-    "convex-test": "0.0.49",
-    "typescript": "5.9.3",
-    "vite": "^7.1.12",
-    "vitest": "^4.1.4"
+    "@types/node": "24.13.6",
+    "convex": "1.46.0",
+    "convex-test": "0.0.60",
+    "prettier": "3.9.9",
+    "typescript": "6.0.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.3"
   },
   "types": "./dist/client/index.d.ts",
   "main": "./dist/client/index.js",
-  "module": "./dist/client/index.js"
+  "module": "./dist/client/index.js",
+  "x-upstream": {
+    "repository": "https://github.com/ezyyeah/cloudflare-email-sending",
+    "revision": "ecd56ba4e6da0cb528c44fb45c63bd8ada2fa3b7",
+    "modifiedBy": "Fantastic Dev HQ (2026); see UPSTREAM.md"
+  }
 }

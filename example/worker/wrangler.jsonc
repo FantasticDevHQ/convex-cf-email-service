@@ -1,0 +1,24 @@
+{
+  "name": "convex-email-example",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-08",
+  "send_email": [{ "name": "EMAIL" }],
+  "queues": {
+    "consumers": [
+      {
+        "queue": "email-delivery-events",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 5,
+        "dead_letter_queue": "email-delivery-events-dlq",
+      },
+    ],
+  },
+  "vars": {
+    "ACCOUNT_ID": "REPLACE_WITH_ACCOUNT_ID",
+    "ZONE_ID": "REPLACE_WITH_ZONE_ID",
+    "SENDING_DOMAIN": "send.example.com",
+    "SUBSCRIPTION_ID": "REPLACE_WITH_SUBSCRIPTION_ID",
+    "CONVEX_EVENTS_URL": "https://REPLACE_WITH_HOST.convex.site/email/events",
+  },
+}

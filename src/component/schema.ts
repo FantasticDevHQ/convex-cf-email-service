@@ -1,76 +1,76 @@
+// Modified by Fantastic Dev HQ, 2026: no credentials; indexed durable intent and events.
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import {
-  vEmailAddress,
-  vEmailError,
-  vEmailState,
-  vProviderAcceptance,
-  vPersistedRuntimeConfig,
-} from "./shared.js";
-
+import { payloadV, stateV, deliveryV, eventV, codeV } from "./shared.js";
 export default defineSchema({
-  content: defineTable({
-    kind: v.union(
-      v.literal("html"),
-      v.literal("text"),
-      v.literal("attachment"),
-    ),
-    mimeType: v.optional(v.string()),
-    filename: v.optional(v.string()),
-    storageId: v.string(),
-    disposition: v.optional(
-      v.union(v.literal("attachment"), v.literal("inline")),
-    ),
-    contentIdHeader: v.optional(v.string()),
-    bytes: v.number(),
-    createdAt: v.number(),
-  }).index("by_kind", ["kind"]),
-
   emails: defineTable({
-    from: vEmailAddress,
-    to: v.array(v.string()),
-    cc: v.optional(v.array(v.string())),
-    bcc: v.optional(v.array(v.string())),
-    replyTo: v.optional(vEmailAddress),
-    subject: v.string(),
-    htmlContentId: v.optional(v.id("content")),
-    textContentId: v.optional(v.id("content")),
-    attachmentContentIds: v.optional(v.array(v.id("content"))),
-    headers: v.optional(v.record(v.string(), v.string())),
-    metadata: v.optional(v.record(v.string(), v.string())),
-    idempotencyKey: v.optional(v.string()),
-    payloadFingerprint: v.string(),
-    runtimeConfig: vPersistedRuntimeConfig,
-    estimatedMessageSize: v.number(),
-    state: vEmailState,
-    attemptCount: v.number(),
-    acceptedAt: v.optional(v.number()),
-    lastAttemptAt: v.optional(v.number()),
-    nextRetryAt: v.optional(v.number()),
-    result: v.optional(vProviderAcceptance),
-    error: v.optional(vEmailError),
-    dispatchReservationId: v.optional(v.string()),
-    currentWorkId: v.optional(v.string()),
+    scope: v.string(),
+    key: v.string(),
+    digest: v.string(),
+    transport: v.string(),
+    handle: v.string(),
+    payload: v.optional(payloadV),
+    state: stateV,
+    attempt: v.number(),
+    maxAttempts: v.number(),
+    expiresAt: v.number(),
     createdAt: v.number(),
-    updatedAt: v.number(),
-    finalizedAt: v.optional(v.number()),
+    nextAt: v.number(),
+    metadataUntil: v.number(),
+    dedupUntil: v.number(),
+    cancelRequested: v.boolean(),
+    code: v.optional(codeV),
   })
-    .index("by_state_nextRetryAt", ["state", "nextRetryAt"])
-    .index("by_idempotencyKey", ["idempotencyKey"])
-    .index("by_createdAt", ["createdAt"]),
-
+    .index("by_scope_key", ["scope", "key"])
+    .index("by_scope_state", ["scope", "state"]),
   attempts: defineTable({
     emailId: v.id("emails"),
-    attemptNumber: v.number(),
-    startedAt: v.number(),
+    number: v.number(),
+    at: v.number(),
     finishedAt: v.optional(v.number()),
-    requestSummary: v.optional(v.string()),
-    httpStatus: v.optional(v.number()),
-    providerCode: v.optional(v.union(v.number(), v.string())),
-    responseSummary: v.optional(v.string()),
-    errorMessage: v.optional(v.string()),
-    retryable: v.boolean(),
+    outcome: v.optional(
+      v.union(
+        v.literal("accepted"),
+        v.literal("not_sent"),
+        v.literal("ambiguous"),
+        v.literal("abandoned"),
+      ),
+    ),
+    code: v.optional(codeV),
+  }).index("by_email_number", ["emailId", "number"]),
+  recipients: defineTable({
+    emailId: v.id("emails"),
+    scope: v.string(),
+    recipient: v.string(),
+    messageId: v.optional(v.string()),
+    state: deliveryV,
+    at: v.number(),
   })
-    .index("by_emailId", ["emailId"])
-    .index("by_startedAt", ["startedAt"]),
+    .index("by_email", ["emailId"])
+    .index("by_scope_message_recipient", ["scope", "messageId", "recipient"]),
+  events: defineTable({
+    scope: v.string(),
+    event: eventV,
+    digest: v.string(),
+    applied: v.boolean(),
+  })
+    .index("by_scope_event", ["scope", "event.eventId"])
+    .index("by_correlation", [
+      "scope",
+      "event.messageId",
+      "event.recipient",
+      "applied",
+    ]),
+  suppressions: defineTable({
+    scope: v.string(),
+    hash: v.string(),
+    reason: v.union(v.literal("bounce"), v.literal("complaint")),
+    at: v.number(),
+  }).index("by_scope_hash", ["scope", "hash"]),
+  metrics: defineTable({
+    scope: v.string(),
+    day: v.number(),
+    name: v.string(),
+    count: v.number(),
+  }).index("by_scope_day_name", ["scope", "day", "name"]),
 });

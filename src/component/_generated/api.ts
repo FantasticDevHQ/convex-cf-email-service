@@ -8,15 +8,10 @@
  * @module
  */
 
-import type * as actions from "../actions.js";
-import type * as config from "../config.js";
-import type * as encoding from "../encoding.js";
-import type * as mutations from "../mutations.js";
-import type * as provider from "../provider.js";
-import type * as queries from "../queries.js";
+import type * as dispatch from "../dispatch.js";
+import type * as email from "../email.js";
 import type * as shared from "../shared.js";
 import type * as validation from "../validation.js";
-import type * as workpool from "../workpool.js";
 
 import type {
   ApiFromModules,
@@ -26,15 +21,10 @@ import type {
 import { anyApi, componentsGeneric } from "convex/server";
 
 const fullApi: ApiFromModules<{
-  actions: typeof actions;
-  config: typeof config;
-  encoding: typeof encoding;
-  mutations: typeof mutations;
-  provider: typeof provider;
-  queries: typeof queries;
+  dispatch: typeof dispatch;
+  email: typeof email;
   shared: typeof shared;
   validation: typeof validation;
-  workpool: typeof workpool;
 }> = anyApi as any;
 
 /**
@@ -63,6 +53,4 @@ export const internal: FilterApi<
   FunctionReference<any, "internal">
 > = anyApi as any;
 
-export const components = componentsGeneric() as unknown as {
-  sendWorkpool: import("@convex-dev/workpool/_generated/component.js").ComponentApi<"sendWorkpool">;
-};
+export const components = componentsGeneric() as unknown as {};
