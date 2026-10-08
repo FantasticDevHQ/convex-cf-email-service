@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.2.1...v0.2.2) (2026-10-08)
+
+
+### Bug Fixes
+
+* preserve idempotent replay after send expiry ([9a83ce5](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/9a83ce56bdd0d7bf9e1267e695312adfdeba4f36))
+* preserve idempotent replay after send expiry ([e4039d7](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/e4039d7020d1c6e2795a4d0b77084eae0aa206c6))
+
 ## [0.2.1](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.2.0...v0.2.1) (2026-10-08)
 
 
