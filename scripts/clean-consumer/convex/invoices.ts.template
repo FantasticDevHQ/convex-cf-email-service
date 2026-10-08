@@ -1,0 +1,23 @@
+import { internalAction,internalMutation,internalQuery } from './_generated/server.js';
+import { components,internal } from './_generated/api.js';
+import { CloudflareEmail,dispatchV,resultV,eventV } from '@fantastic.dev/convex-cf-email-service';
+import { v } from 'convex/values';
+const mail=new CloudflareEmail(components.mail);
+export const send=internalAction({args:dispatchV,returns:resultV,handler:async(_ctx,request)=>({kind:'accepted' as const,recipients:request.payload.to.map(recipient=>({recipient,status:'accepted' as const,messageId:'provider-id'}))})});
+export const create=internalMutation({args:{key:v.string()},returns:v.string(),handler:async(ctx,{key}):Promise<string>=>{
+ const orderId=await ctx.db.insert('invoices',{amount:123});
+ const id=await mail.enqueue(ctx,{scope:'independent-store',key,transport:'stub',send:internal.invoices.send,expiresAt:Date.now()+60000,payload:{from:'invoices@example.com',to:['reader@example.net'],subject:'Invoice',text:'Amount: 123'}});
+ await ctx.db.patch(orderId,{emailId:id});return id;
+}});
+export const receive=internalMutation({args:{event:eventV},returns:v.string(),handler:async(ctx,{event}):Promise<string>=>await ctx.runMutation(components.mail.email.ingest,{scope:'independent-store',event})});
+export const state=internalQuery({args:{id:v.string()},returns:v.any(),handler:async(ctx,{id})=>await ctx.runQuery(components.mail.email.status,{id})});
+export const other=internalQuery({args:{id:v.string()},returns:v.any(),handler:async(ctx,{id})=>await ctx.runQuery(components.authMail.email.status,{id})});
+export const smoke=internalAction({args:{},returns:v.boolean(),handler:async(ctx):Promise<boolean>=>{
+ const id=await ctx.runMutation(internal.invoices.create,{key:`local-smoke-${Date.now()}`});
+ let accepted=false;
+ for(let i=0;i<30;i++){const result=await ctx.runQuery(internal.invoices.state,{id});if(result?.state==='accepted'){accepted=true;break;}await new Promise(resolve=>setTimeout(resolve,100));}
+ if(!accepted)throw new Error('Local host callback did not complete');
+ await ctx.runMutation(internal.invoices.receive,{event:{eventId:`live-${Date.now()}`,messageId:'provider-id',recipient:'reader@example.net',kind:'delivered',at:Date.now(),permanent:false}});
+ const final=await ctx.runQuery(internal.invoices.state,{id});
+ if(final?.delivery[0]?.state!=='delivered')throw new Error('Live event ingestion failed');return true;
+}});

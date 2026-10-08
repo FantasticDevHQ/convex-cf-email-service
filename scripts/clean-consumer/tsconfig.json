@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ESNext","module":"ESNext","moduleResolution":"Bundler","strict":true,"skipLibCheck":true,"noEmit":true,"lib":["ES2023","DOM"],"types":["node","vite/client"]},"include":["**/*.ts"]}
