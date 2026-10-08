@@ -1,0 +1,19 @@
+import { convexTest } from 'convex-test';
+import { expect,test,vi } from 'vitest';
+import { internal } from './convex/_generated/api.js';
+import schema from './convex/schema.js';
+import emailTest from '@fantastic.dev/convex-cf-email-service/test';
+const modules=import.meta.glob('./convex/**/*.ts');
+test('packed component sends through a host handle, reconciles events and isolates two mounts',async()=>{
+ vi.useFakeTimers();try{
+ const t=convexTest(schema,modules);emailTest.register(t,'mail');emailTest.register(t,'authMail');
+ const event={eventId:'early',messageId:'provider-id',recipient:'reader@example.net',kind:'delivered' as const,at:Date.now(),permanent:false};
+ expect(await t.mutation(internal.invoices.receive,{event})).toBe('pending');
+ const id=await t.mutation(internal.invoices.create,{key:'invoice-1'});
+ await vi.advanceTimersByTimeAsync(1);await t.finishInProgressScheduledFunctions();
+ expect(await t.query(internal.invoices.state,{id})).toMatchObject({state:'accepted',attempt:1,delivery:[{state:'delivered',count:1}]});
+ expect(await t.mutation(internal.invoices.create,{key:'invoice-1'})).toBe(id);
+ expect(await t.mutation(internal.invoices.receive,{event})).toBe('duplicate');
+ expect(await t.query(internal.invoices.other,{id})).toBeNull();
+ }finally{vi.useRealTimers();}
+});

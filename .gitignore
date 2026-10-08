@@ -1,0 +1,9 @@
+node_modules
+dist
+.convex
+*.tsbuildinfo
+*.tgz
+.env*
+.DS_Store
+
+.readme-check-*
