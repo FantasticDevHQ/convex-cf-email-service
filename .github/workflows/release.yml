@@ -40,14 +40,15 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      # Releases and tags use GITHUB_TOKEN on purpose: its events do not trigger workflows, so
-      # the v* tag push cannot start a second publish below.
-      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
-        id: release
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-          skip-github-pull-request: true
+          persist-credentials: false
+      - name: Require organization release App bootstrap
+        env:
+          RELEASE_APP_CLIENT_ID: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+        run: bash scripts/release-preflight.sh
+      # Authenticate the App before the release-only pass can create tags.
       # The release PR uses the org-wide release GitHub App, so it triggers CI like any other PR
       # and can satisfy the required checks on main.
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
@@ -58,6 +59,14 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
           permission-issues: write
+      # Releases and tags use GITHUB_TOKEN on purpose: its events do not trigger workflows, so
+      # the v* tag push cannot start a second publish below.
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-pull-request: true
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
@@ -70,7 +79,7 @@ jobs:
     needs: release-please
     if: >-
       always() && !cancelled() &&
-      (needs.release-please.outputs.release_created == 'true' ||
+      ((needs.release-please.result == 'success' && needs.release-please.outputs.release_created == 'true') ||
        (startsWith(github.ref, 'refs/tags/v') && needs.release-please.result == 'skipped'))
     runs-on: ubuntu-24.04
     timeout-minutes: 20

@@ -69,3 +69,24 @@ Primary npm references:
 
 - https://docs.npmjs.com/trusted-publishers/
 - https://docs.npmjs.com/generating-provenance-statements/
+
+## Post-merge bootstrap diagnosis
+
+PR #1 merged as 777f518b68a12f23af81d1b509ddb1b3010b4652 on 2026-10-08.
+Both main-branch CI jobs passed. Release run 37778664206 failed because the
+release App private-key input was empty. Read-only organization metadata confirms
+RELEASE_APP_PRIVATE_KEY exists with selected-repository visibility, and this
+repository is not selected. RELEASE_APP_CLIENT_ID is available. An owner must
+explicitly authorize and enable this repository for that existing secret, and
+confirm the App installation includes this repository. No key should be copied
+into source or a plaintext cache.
+
+The workflow now checks bootstrap before creating tags and obtains the App token
+before its GITHUB_TOKEN release-only pass. A failed release job cannot enter the
+normal publisher path; the manual-tag path remains available when that job is
+skipped. Tests cover missing inputs, no credential output, ordering and publishing
+failure gating. This makes missing setup explicit without bypassing it or silently
+reporting a successful release. Repository visibility remains PRIVATE, and no npm
+publication or live deployment has been authorized.
+
+Failed run: https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37778664206
