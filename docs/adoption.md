@@ -2,8 +2,8 @@
 
 This document is the deliverable. No Jib checkout, schema, auth, templates, metrics
 or deployment has been changed. Jib integration must use separately authorized
-JIB-team tickets, after npm release readiness/publication (FANT-62). This plan can
-be reviewed before release; activation remains blocked on that dependency.
+JIB-team tickets, after npm release readiness/publication (FANT-62). The publication dependency is satisfied by verified npm version 0.2.1. Actual
+activation still requires separately authorized JIB work and live canary approval.
 
 Proposed separately tracked JIB work:
 

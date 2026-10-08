@@ -96,6 +96,17 @@ export const enqueue = mutation({
       max = a.maxAttempts ?? 4,
       metadata = a.metadataDays ?? 30,
       dedup = a.dedupDays ?? 90;
+    // Existing intents retain their original policy, even after expiry/redaction.
+    const fingerprint = digest({ payload: p, transport: a.transport });
+    const existing = await ctx.db
+      .query("emails")
+      .withIndex("by_scope_key", (q) => q.eq("scope", a.scope).eq("key", a.key))
+      .unique();
+    if (existing) {
+      if (existing.digest !== fingerprint)
+        throw new Error("Idempotency conflict");
+      return existing._id;
+    }
     if (
       !Number.isFinite(a.expiresAt) ||
       a.expiresAt <= now ||
@@ -114,16 +125,6 @@ export const enqueue = mutation({
       dedup > 365
     )
       throw new Error("Invalid bounded policy");
-    const fingerprint = digest({ payload: p, transport: a.transport });
-    const existing = await ctx.db
-      .query("emails")
-      .withIndex("by_scope_key", (q) => q.eq("scope", a.scope).eq("key", a.key))
-      .unique();
-    if (existing) {
-      if (existing.digest !== fingerprint)
-        throw new Error("Idempotency conflict");
-      return existing._id;
-    }
     const id = await ctx.db.insert("emails", {
       scope: a.scope,
       key: a.key,

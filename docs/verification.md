@@ -1,10 +1,10 @@
 # Implementation evidence and remaining gates
 
 Project and FANT-52 through FANT-62 were read before implementation on 2026-10-08.
-Both Linear connector and direct CLI confirm that the issue descriptions contain
-literal truncation markers, with missing acceptance text; no comments restore it.
-No acceptance boxes or Done states are claimed for unseen criteria. The visible
-scopes and the complete project description define the implemented contract.
+The initial Linear descriptions contained literal truncation markers. Acceptance
+criteria have since been reconstructed from the approved project scope and owner
+instructions, recorded in full on FANT-52 through FANT-62, and verified against
+source/tests and release evidence. They are not a recovery of the damaged text.
 
 | Ticket  | Implementation and reproducible evidence                                                                                                                                                                                                                                                                                               |
 | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -69,6 +69,19 @@ Evidence links:
 - https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37794588228
 - https://search.sigstore.dev/?logIndex=3149794516
 
-Remaining gates are review of the release recovery fix and separately authorized
-live infrastructure/provider canary. JIB adoption remains a plan for separate work.
-Missing ticket acceptance text remains unresolved; no unseen boxes are checked.
+## Current release and follow-up audit
+
+Version 0.2.1 is published from reviewed commit
+0a0c13d65b22b892bc640cce81657b8ac909ebad. Main CI 37802482669 and OIDC release
+run 37802482675 passed. Exact published-version independent consumer passed;
+registry signatures/attestations and artifact licensing/provenance were verified.
+
+A subsequent audit reopened FANT-55: exact idempotent replay after the original
+send deadline incorrectly failed new-intent expiry admission before consulting
+its durable key. Regression tests reproduce this and verify the fix: return the
+existing redacted intent without additional schedules or content restoration,
+report changed payloads as conflicts, and reject new expired intents. The fix
+requires PR review/merge and a subsequent release before consumers receive it.
+
+Separately authorized live infrastructure/provider canary and actual JIB integration
+remain rollout work. Missing ticket text is no longer an acceptance blocker.

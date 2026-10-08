@@ -524,3 +524,54 @@ test("event races with many pending updates drain in bounded durable batches", a
     ),
   ).toBe(true);
 });
+
+test("expired idempotent replay returns the redacted intent without scheduling or resurrecting content", async () => {
+  const t = convexTest(schema, modules),
+    a = request();
+  const id = await t.mutation(anyApi.email.enqueue, a);
+  vi.setSystemTime(a.expiresAt + 1);
+  await t.mutation(anyApi.email.expire, { id });
+  const before = await t.run((ctx) =>
+    ctx.db.system.query("_scheduled_functions").collect(),
+  );
+  expect(await t.mutation(anyApi.email.enqueue, a)).toBe(id);
+  const saved = await t.run((ctx) => ctx.db.get("emails", id));
+  expect(saved).toMatchObject({
+    state: "expired",
+    expiresAt: a.expiresAt,
+    attempt: 0,
+  });
+  expect(saved?.payload).toBeUndefined();
+  expect(await t.run((ctx) => ctx.db.query("emails").collect())).toHaveLength(
+    1,
+  );
+  expect(
+    await t.run((ctx) => ctx.db.system.query("_scheduled_functions").collect()),
+  ).toHaveLength(before.length);
+});
+
+test("expired conflicting replay still reports an idempotency conflict", async () => {
+  const t = convexTest(schema, modules),
+    a = request();
+  await t.mutation(anyApi.email.enqueue, a);
+  vi.setSystemTime(a.expiresAt + 1);
+  await expect(
+    t.mutation(anyApi.email.enqueue, {
+      ...a,
+      payload: { ...a.payload, text: "changed" },
+    }),
+  ).rejects.toThrow("Idempotency conflict");
+});
+
+test("new intent still rejects an expired send deadline", async () => {
+  const t = convexTest(schema, modules);
+  await expect(
+    t.mutation(anyApi.email.enqueue, {
+      ...request(),
+      expiresAt: Date.now() - 1,
+    }),
+  ).rejects.toThrow("Expiry must be within 24 hours");
+  expect(await t.run((ctx) => ctx.db.query("emails").collect())).toHaveLength(
+    0,
+  );
+});
