@@ -14,6 +14,6 @@ test('packed component sends through a host handle, reconciles events and isolat
  expect(await t.query(internal.invoices.state,{id})).toMatchObject({state:'accepted',attempt:1,delivery:[{state:'delivered',count:1}]});
  expect(await t.mutation(internal.invoices.create,{key:'invoice-1'})).toBe(id);
  expect(await t.mutation(internal.invoices.receive,{event})).toBe('duplicate');
- await expect(t.query(internal.invoices.other,{id})).rejects.toThrow();
+ expect(await t.query(internal.invoices.other,{id})).toBeNull();
  }finally{vi.useRealTimers();}
 });
