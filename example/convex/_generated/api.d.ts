@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as demo from "../demo.js";
 import type * as email from "../email.js";
 import type * as http from "../http.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  demo: typeof demo;
   email: typeof email;
   http: typeof http;
 }>;

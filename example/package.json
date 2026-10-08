@@ -5,5 +5,13 @@
   "dependencies": {
     "@fantastic.dev/convex-cf-email-service": "workspace:*",
     "convex": "1.46.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit -p tsconfig.json && vite build"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vite": "8.3.1"
   }
 }
