@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.2.0...v0.2.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* preserve existing GitHub releases during tag publication ([cf739b1](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/cf739b1bb712a4a8f3a91cbafe2bd44a8b540e72))
+* preserve existing GitHub releases during tag publication ([fce2f9d](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/fce2f9dedb201ba83e9fea012f91a2b05b7bfc87))
+
 ## [0.2.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.1.0...v0.2.0) (2026-10-08)
 
 
