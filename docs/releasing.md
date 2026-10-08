@@ -57,8 +57,9 @@ Bootstrap requirements for future repositories (completed here with owner author
 6. Separately approve domain/Queue/Worker/Convex live deployment and provider
    credentials. Use the adoption canary and rollback criteria before production.
 
-Publication and provenance are verified below; missing Linear acceptance text is
-separately recorded in docs/verification.md. Live rollout remains separately authorized.
+Publication and provenance are verified below. Linear acceptance criteria were
+reconstructed from the approved scope; current follow-up verification is recorded
+in docs/verification.md. Live rollout remains separately authorized.
 
 Primary npm references:
 

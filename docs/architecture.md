@@ -65,7 +65,9 @@ is no documented provider lookup that this package can safely invent.
 
 The durable unique key is `(scope, key)` within a mount. SHA-256 covers the canonical
 payload and transport alias. Reuse with different content/transport rejects;
-reuse with the same content returns the original ID and original policy. Changing
+reuse with the same content returns the original ID and original policy, including
+a replay after the original send deadline or content redaction. Only new intents
+are subject to the current 24-hour expiry/policy admission checks. Changing
 expiry, attempt limits, retention or callback does not resurrect an old intent.
 After the dedup horizon a key may be reused; callers must choose a horizon matching
 their business replay window. Keys must be opaque identifiers, not email links,
