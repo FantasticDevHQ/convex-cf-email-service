@@ -71,7 +71,7 @@ Evidence links:
 
 ## Current release and follow-up audit
 
-Version 0.2.1 is published from reviewed commit
+Version 0.2.1 was published from reviewed commit
 0a0c13d65b22b892bc640cce81657b8ac909ebad. Main CI 37802482669 and OIDC release
 run 37802482675 passed. Exact published-version independent consumer passed;
 registry signatures/attestations and artifact licensing/provenance were verified.
@@ -81,7 +81,14 @@ send deadline incorrectly failed new-intent expiry admission before consulting
 its durable key. Regression tests reproduce this and verify the fix: return the
 existing redacted intent without additional schedules or content restoration,
 report changed payloads as conflicts, and reject new expired intents. The fix
-requires PR review/merge and a subsequent release before consumers receive it.
+was merged and released in 0.2.2, so consumers on 0.2.2 or later receive it.
+
+Version 0.3.0 is now published from reviewed commit
+`93699d2f16fd113984ad0f770cfb9ba6fa9e8615`. Release run
+[37946970162](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37946970162)
+passed, and the npm registry reports 0.3.0 as the latest version. The isolated
+live binding/Queue canary is tracked in [live-canary.md](./live-canary.md); its
+pending live evidence is separate from the component's automated tests.
 
 Separately authorized live infrastructure/provider canary and actual JIB integration
 remain rollout work. Missing ticket text is no longer an acceptance blocker.
