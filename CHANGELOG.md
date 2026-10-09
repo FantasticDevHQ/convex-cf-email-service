@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.2.2...v0.3.0) (2026-10-09)
+
+
+### Features
+
+* **example:** add a hosted password-protected email demo ([2b958f4](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/2b958f42a50ce26b4664c14198e3ce78231c9cab))
+* **example:** add Vite email sending studio (FANT-63) ([1c6a3d9](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/1c6a3d905a4cf680c98a1d0d2d2ef71cd5b6ec12))
+* **example:** deploy password-protected email studio ([bb13426](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/bb13426e2681ccc2b10bc28822320eebfe91da74))
+
+
+### Bug Fixes
+
+* **example:** clarify branding and surface setup instructions ([2c5330a](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/2c5330af613ef4c6ee4d3e1fb0492636a692363c))
+
 ## [0.2.2](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.2.1...v0.2.2) (2026-10-08)
 
 
