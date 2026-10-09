@@ -21,6 +21,46 @@ beforeEach(() => {
   vi.stubEnv("EMAIL_DEMO_ACCESS_CODE", "a".repeat(32));
   vi.stubEnv("EMAIL_DEMO_RECIPIENTS", "reader@example.net");
   vi.stubEnv("EMAIL_DEMO_FROM", "sender@example.com");
+  vi.stubEnv("EMAIL_DEMO_TRANSPORT", "primary");
+});
+test("demo selects the internal Worker callback and fails closed for unknown transport configuration", async () => {
+  const t = backend();
+  vi.stubEnv("EMAIL_DEMO_TRANSPORT", "worker");
+  vi.stubEnv("EMAIL_WORKER_SEND_URL", "https://cf-email.fantastic.dev/send");
+  vi.stubEnv("EMAIL_SEND_BRIDGE_SECRET", "s".repeat(40));
+  const fetcher = vi.fn(
+    async (_url: string | URL | Request, _options?: RequestInit) =>
+      Response.json({
+        kind: "accepted",
+        recipients: [
+          {
+            recipient: input().recipient,
+            messageId: "binding-canary",
+            status: "accepted",
+          },
+        ],
+      }),
+  );
+  vi.stubGlobal("fetch", fetcher);
+  await t.mutation(anyApi.demo.submit, input());
+  await t.finishInProgressScheduledFunctions();
+  await t.finishAllScheduledFunctions(() => vi.advanceTimersByTime(0));
+  expect(fetcher).toHaveBeenCalledOnce();
+  const sent = JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body));
+  expect(sent.transport).toBe("worker");
+  expect(
+    await t.query(anyApi.demo.status, {
+      accessCode: input().accessCode,
+      requestId: input().requestId,
+    }),
+  ).toMatchObject({ state: "accepted" });
+  vi.stubEnv("EMAIL_DEMO_TRANSPORT", "typo");
+  await expect(
+    t.mutation(anyApi.demo.submit, {
+      ...input(),
+      requestId: "22222222-2222-4222-8222-222222222222",
+    }),
+  ).rejects.toThrow("Demo transport is not configured");
 });
 afterEach(() => {
   vi.unstubAllEnvs();

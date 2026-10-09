@@ -11,7 +11,8 @@
     "build": "tsc --noEmit -p tsconfig.json && vite build",
     "deploy:backend": "convex deploy --env-file deployment.env --cmd 'pnpm run build' --cmd-url-env-var-name VITE_CONVEX_URL",
     "deploy:site": "wrangler deploy",
-    "check:deployment": "wrangler deploy --dry-run"
+    "deploy:canary": "node ../scripts/deploy-canary.mjs",
+    "check:deployment": "wrangler deploy --dry-run && wrangler deploy --config wrangler.canary.jsonc --dry-run"
   },
   "devDependencies": {
     "typescript": "6.0.3",

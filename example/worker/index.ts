@@ -10,6 +10,7 @@ import {
 } from "@fantastic.dev/convex-cf-email-service/transport";
 import type { DispatchRequest } from "@fantastic.dev/convex-cf-email-service";
 interface Env {
+  ASSETS?: { fetch(request: Request): Promise<Response> };
   EMAIL: EmailBinding;
   SEND_BRIDGE_SECRET: string;
   EVENT_BRIDGE_SECRET: string;
@@ -23,7 +24,9 @@ interface Env {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (new URL(request.url).pathname !== "/send")
-      return new Response(null, { status: 404 });
+      return env.ASSETS
+        ? env.ASSETS.fetch(request)
+        : new Response(null, { status: 404 });
     let input: DispatchRequest;
     try {
       input = (await authenticatedBody(
@@ -36,6 +39,8 @@ export default {
       return new Response(null, { status: 401 });
     }
     if (
+      !input ||
+      typeof input !== "object" ||
       input.scope !== "store" ||
       input.transport !== "worker" ||
       !Number.isFinite(input.expiresAt) ||

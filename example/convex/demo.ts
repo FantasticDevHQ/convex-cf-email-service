@@ -35,6 +35,9 @@ export const submit = mutation({
       throw new ConvexError("Recipient is not enabled for this demo");
     const from = process.env.EMAIL_DEMO_FROM;
     if (!from) throw new ConvexError("Demo sender is not configured");
+    const transport = process.env.EMAIL_DEMO_TRANSPORT ?? "primary";
+    if (transport !== "primary" && transport !== "worker")
+      throw new ConvexError("Demo transport is not configured");
     if (
       !a.subject.trim() ||
       a.subject.length > 200 ||
@@ -59,8 +62,11 @@ export const submit = mutation({
     const emailId = await email.enqueue(ctx, {
       scope: "store",
       key: `demo:${a.requestId}`,
-      transport: "primary",
-      send: internal.email.transport,
+      transport,
+      send:
+        transport === "worker"
+          ? internal.email.workerTransport
+          : internal.email.transport,
       expiresAt: Date.now() + 5 * 60000,
       maxAttempts: 3,
       metadataDays: 1,
