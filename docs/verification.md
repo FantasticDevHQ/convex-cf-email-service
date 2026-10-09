@@ -92,3 +92,14 @@ pending live evidence is separate from the component's automated tests.
 
 Separately authorized live infrastructure/provider canary and actual JIB integration
 remain rollout work. Missing ticket text is no longer an acceptance blocker.
+
+## Workers runtime audit — 2026-10-09
+
+FANT-56 was reopened: npm 0.3.0 Queue forwarding uses `redirect: "error"`,
+which workerd rejects before fetch despite passing Node tests. The follow-up
+changes it to manual redirects with non-2xx rejection and adds a regression
+test in the actual Workers runtime. The isolated live Worker is already fixed:
+synthetic forwarding, six-attempt exhaustion, DLQ recovery and durable duplicate
+ingestion passed. Merge/release of the package fix remains a gate. Real Gmail
+receipt and passing SPF/DKIM/DMARC are verified separately; provider-origin event
+publication/correlation remains unverified. See [live-canary.md](./live-canary.md).
