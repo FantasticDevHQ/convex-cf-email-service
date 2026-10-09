@@ -47,6 +47,16 @@ source configuration/schema. Duplicate replay is safe. Do not acknowledge before
 persistence. DLQ replay after the 30-day event dedup horizon is a new event; keep
 replay within that horizon or perform explicit reconciliation.
 
+Outbound forwarding uses `redirect: "manual"` and rejects non-2xx responses,
+including redirects. Workers rejects `redirect: "error"` before sending; Node
+tests alone do not detect that runtime difference. The package check includes
+an actual workerd regression test for 503 retry, redirect rejection without
+following the destination, and recovery to 204 acknowledgement.
+`forwardEvents` accepts an optional failure callback with only `invalid_event`,
+`signing_failed`, or `forward_failed`; diagnostic failures cannot interrupt the
+batch. The example logs aggregate response/failure counts without event bodies,
+addresses, signatures or keys.
+
 Correlation uses `(scope, provider message ID, normalized recipient)`, never email
 address alone. Pending events are stored for acceptance/event races, up to 100
 unmatched events per correlation tuple. Recipient updates and applied flags commit
