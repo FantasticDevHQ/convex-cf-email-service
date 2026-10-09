@@ -89,7 +89,7 @@ export async function sendRest(
       `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/email/sending/send`,
       {
         method: "POST",
-        redirect: "error",
+        redirect: "manual",
         signal: AbortSignal.timeout(30000),
         headers: {
           Authorization: `Bearer ${config.apiToken}`,

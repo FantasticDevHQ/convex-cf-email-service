@@ -98,6 +98,7 @@ test("signed binding dispatch returns the provider ID, rejects cross-scope dispa
   expect(e.EMAIL.send).toHaveBeenCalledTimes(2);
 });
 test("actual Queue handler signs sanitized events, retries forwarding failure, and acknowledges only after success", async () => {
+  const diagnostic = vi.spyOn(console, "info").mockImplementation(() => {});
   const e = env();
   const body = {
     type: "cf.email.sending.message.delivered",
@@ -153,4 +154,27 @@ test("actual Queue handler signs sanitized events, retries forwarding failure, a
   expect(mismatched.retry).toHaveBeenCalledOnce();
   expect(mismatched.ack).not.toHaveBeenCalled();
   expect(fetcher).toHaveBeenCalledTimes(2);
+  expect(diagnostic).toHaveBeenCalledWith(
+    JSON.stringify({
+      event: "email_queue_batch",
+      forwarded: 0,
+      retried: 1,
+      responseCounts: { "503": 1 },
+        failureCounts: { forward_failed: 1 },
+    }),
+  );
+  expect(diagnostic).toHaveBeenCalledWith(
+    JSON.stringify({
+      event: "email_queue_batch",
+      forwarded: 1,
+      retried: 0,
+      responseCounts: { "204": 1 },
+        failureCounts: {},
+    }),
+  );
+  expect(JSON.stringify(diagnostic.mock.calls)).not.toContain("private");
+  expect(JSON.stringify(diagnostic.mock.calls)).not.toContain(
+    "reader@example.net",
+  );
+  diagnostic.mockRestore();
 });

@@ -85,6 +85,7 @@ test("queue messages ack only after durable ingestion success and retry failures
   let n = 0;
   const fetcher: typeof fetch = async () =>
     new Response(null, { status: ++n === 1 ? 204 : 503 });
+  const failure = vi.fn();
   expect(
     await forwardEvents(
       [a, b, c],
@@ -92,9 +93,39 @@ test("queue messages ack only after durable ingestion success and retry failures
       "https://host.example/events",
       secret,
       fetcher,
+      failure,
     ),
   ).toEqual({ forwarded: 1, retried: 2 });
   expect(a.ack).toHaveBeenCalledOnce();
   expect(b.retry).toHaveBeenCalledOnce();
   expect(c.retry).toHaveBeenCalledOnce();
+  expect(failure.mock.calls).toEqual([["forward_failed"], ["invalid_event"]]);
+});
+test("signing failures are sanitized and a broken diagnostic callback cannot interrupt retries", async () => {
+  const messages = [0, 1].map(() => ({
+    body: event(),
+    ack: vi.fn(),
+    retry: vi.fn(),
+  }));
+  const fetcher = vi.fn();
+  const reasons: string[] = [];
+  expect(
+    await forwardEvents(
+      messages,
+      config,
+      "https://host.example/events",
+      "short",
+      fetcher,
+      (reason) => {
+        reasons.push(reason);
+        throw new Error("private diagnostic failure");
+      },
+    ),
+  ).toEqual({ forwarded: 0, retried: 2 });
+  expect(reasons).toEqual(["signing_failed", "signing_failed"]);
+  expect(fetcher).not.toHaveBeenCalled();
+  for (const message of messages) {
+    expect(message.retry).toHaveBeenCalledOnce();
+    expect(message.ack).not.toHaveBeenCalled();
+  }
 });
