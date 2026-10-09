@@ -32,12 +32,8 @@ header {
 .brand {
   text-decoration: none;
   font-weight: 700;
-  font-size: 24px;
-  letter-spacing: -2px;
-}
-.brand span {
-  color: #b84126;
-  padding: 0 3px;
+  font-size: 21px;
+  letter-spacing: -0.6px;
 }
 .wordmark {
   font-size: 12px;
@@ -315,6 +311,9 @@ footer a {
   header {
     height: 78px;
     gap: 15px;
+  }
+  .brand {
+    font-size: 17px;
   }
   .wordmark {
     display: none;

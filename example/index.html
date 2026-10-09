@@ -12,11 +12,24 @@
         <a
           class="brand"
           href="https://github.com/FantasticDevHQ/convex-cf-email-service"
-          >F<span>✳</span>HQ</a
-        ><span class="wordmark">Fantastic Dev HQ / Experiments</span
+          >Fantastic Dev HQ</a
+        ><span class="wordmark">Email Studio / Experiments</span
         ><span id="connection" class="connection">Setup required</span>
       </header>
       <main>
+        <section id="setup" class="setup" aria-labelledby="setup-title">
+          <h2 id="setup-title">One small setup step.</h2>
+          <p>
+            Set <code>VITE_CONVEX_URL</code> in
+            <code>example/.env.local</code> and restart Vite. Configure the
+            host’s sender, Cloudflare credentials, access code and recipient
+            allowlist following
+            <a
+              href="https://github.com/FantasticDevHQ/convex-cf-email-service/tree/main/example"
+              >the example guide</a
+            >.
+          </p>
+        </section>
         <div class="intro">
           <p class="eyebrow">CONVEX × CLOUDFLARE</p>
           <h1>Good mail.<br /><em>Real delivery.</em></h1>
@@ -115,19 +128,6 @@
             </p>
           </aside>
         </div>
-        <section id="setup" class="setup" aria-labelledby="setup-title">
-          <h2 id="setup-title">One small setup step.</h2>
-          <p>
-            Set <code>VITE_CONVEX_URL</code> in
-            <code>example/.env.local</code> and restart Vite. Configure the
-            host’s sender, Cloudflare credentials, access code and recipient
-            allowlist following
-            <a
-              href="https://github.com/FantasticDevHQ/convex-cf-email-service/tree/main/example"
-              >the example guide</a
-            >.
-          </p>
-        </section>
       </main>
       <footer>
         <span>SMALL DEMO. REAL EMAIL.</span
