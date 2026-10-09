@@ -1,0 +1,358 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap");
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #242f35;
+  background: #f3f0e8;
+  font-synthesis: none;
+  font-weight: 400;
+  font-size: 15px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-underline-offset: 4px;
+}
+.shell {
+  max-width: 1160px;
+  margin: auto;
+  padding: 0 44px;
+}
+header {
+  height: 98px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid #cccbbf;
+}
+.brand {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 21px;
+  letter-spacing: -0.6px;
+}
+.wordmark {
+  font-size: 12px;
+  color: #606660;
+}
+.connection {
+  margin-left: auto;
+  font-size: 11px;
+  border: 1px solid #bdbdaf;
+  border-radius: 30px;
+  padding: 8px 12px;
+}
+.connection:before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b84126;
+  margin-right: 8px;
+}
+.intro {
+  padding: 52px 0 38px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 48px;
+  align-items: end;
+}
+.eyebrow {
+  grid-column: 1/-1;
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+h1 {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 76px;
+  line-height: 0.94;
+  font-weight: 400;
+  letter-spacing: -2px;
+  margin: 0;
+}
+h1 em {
+  font-weight: 400;
+  color: #b84126;
+}
+.lede {
+  max-width: 360px;
+  line-height: 1.7;
+  color: #61675f;
+  margin: 0 0 4px;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  border: 1px solid #c4c5b8;
+  box-shadow: 0 8px 0 #e7e4da;
+}
+.compose {
+  padding: 28px 32px 22px;
+  background: #faf8f2;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 27px;
+}
+h2 {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+}
+.number {
+  font-size: 9px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  opacity: 0.65;
+}
+label {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 8px;
+}
+label span {
+  font-size: 10px;
+  font-weight: 400;
+  color: #697166;
+}
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #c9ccbe;
+  background: transparent;
+  border-radius: 3px;
+  padding: 12px;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+}
+textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.6;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #878c80;
+}
+input:focus,
+textarea:focus {
+  outline: 2px solid #b84126;
+  outline-offset: 2px;
+}
+button {
+  width: 100%;
+  margin-top: 22px;
+  background: #b84126;
+  color: #fff8ee;
+  border: 0;
+  padding: 15px 17px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+button span {
+  font-size: 20px;
+  line-height: 14px;
+}
+button:hover:enabled {
+  background: #91351f;
+}
+button:disabled {
+  background: #a4a596;
+  cursor: not-allowed;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #b84126;
+  outline-offset: 4px;
+}
+.fine-print {
+  font-size: 10px;
+  color: #777b70;
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+.tracking {
+  background: #24373c;
+  color: #f7f2e7;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+}
+.tracking .section-heading {
+  margin-bottom: 38px;
+}
+.stamp {
+  font-size: 32px;
+  line-height: 1;
+  border: 1px dashed #9aa49b;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 72px;
+  transform: rotate(-6deg);
+  color: #dfb086;
+  margin-bottom: 26px;
+}
+.status-label {
+  font-size: 9px;
+  letter-spacing: 1.7px;
+  color: #bac3b4;
+  margin: 0 0 12px;
+}
+h3 {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  margin: 0 0 16px;
+  text-transform: none;
+}
+.status-description {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #c2ccc2;
+  max-width: 290px;
+}
+.details {
+  margin: 32px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid #526266;
+}
+.details div,
+.send-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 10px 0;
+  font-size: 11px;
+}
+.details dt,
+.send-facts dt {
+  color: #aebdb3;
+}
+.details dd,
+.send-facts dd {
+  margin: 0;
+  text-align: right;
+}
+.delivery-note {
+  font-size: 10px;
+  color: #b7c1b7;
+  line-height: 1.7;
+  margin-top: auto;
+  padding-top: 22px;
+}
+.recipient-states {
+  font-size: 12px;
+  color: #e2bd90;
+}
+.error {
+  font-size: 12px;
+  color: #9b331f;
+  line-height: 1.5;
+}
+.setup {
+  margin-top: 30px;
+  padding: 20px 24px;
+  border: 1px dashed #b7bcae;
+  max-width: 100%;
+}
+.setup p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #5b645a;
+  margin-bottom: 0;
+}
+code {
+  font-size: 11px;
+  background: #e5e3d8;
+  padding: 2px 4px;
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 0;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #687263;
+}
+footer a {
+  text-decoration: none;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 760px) {
+  .shell {
+    padding: 0 22px;
+  }
+  header {
+    height: 78px;
+    gap: 15px;
+  }
+  .brand {
+    font-size: 17px;
+  }
+  .wordmark {
+    display: none;
+  }
+  .intro {
+    padding-top: 34px;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  h1 {
+    font-size: 62px;
+  }
+  .eyebrow {
+    margin: 0;
+  }
+  .lede {
+    max-width: 100%;
+    font-size: 13px;
+  }
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .compose,
+  .tracking {
+    padding: 24px;
+  }
+  .tracking {
+    min-height: 460px;
+  }
+  .tracking .section-heading {
+    margin-bottom: 28px;
+  }
+  footer {
+    gap: 16px;
+  }
+  .section-heading {
+    gap: 10px;
+  }
+  label span {
+    font-size: 9px;
+  }
+}

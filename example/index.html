@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f0e8" />
+    <title>Email Studio · Fantastic Dev HQ</title>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a
+          class="brand"
+          href="https://github.com/FantasticDevHQ/convex-cf-email-service"
+          >Fantastic Dev HQ</a
+        ><span class="wordmark">Email Studio / Experiments</span
+        ><span id="connection" class="connection">Setup required</span>
+      </header>
+      <main>
+        <section id="setup" class="setup" aria-labelledby="setup-title">
+          <h2 id="setup-title">One small setup step.</h2>
+          <p>
+            Set <code>VITE_CONVEX_URL</code> in
+            <code>example/.env.local</code> and restart Vite. Configure the
+            host’s sender, Cloudflare credentials, access code and recipient
+            allowlist following
+            <a
+              href="https://github.com/FantasticDevHQ/convex-cf-email-service/tree/main/example"
+              >the example guide</a
+            >.
+          </p>
+        </section>
+        <div class="intro">
+          <p class="eyebrow">CONVEX × CLOUDFLARE</p>
+          <h1>Good mail.<br /><em>Real delivery.</em></h1>
+          <p class="lede">
+            A little studio for sending an email and watching its journey.
+            Powered by durable Convex jobs and Cloudflare Email Service.
+          </p>
+        </div>
+        <div class="workspace">
+          <section class="compose" aria-labelledby="compose-title">
+            <div class="section-heading">
+              <h2 id="compose-title">Compose a message</h2>
+              <span class="number">01 / SEND</span>
+            </div>
+            <form id="compose-form">
+              <label for="recipient">To <span>Recipient address</span></label
+              ><input
+                id="recipient"
+                name="recipient"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                required
+                maxlength="320"
+              />
+              <label for="subject">Subject</label
+              ><input
+                id="subject"
+                name="subject"
+                placeholder="A hello from Email Studio"
+                required
+                maxlength="200"
+              />
+              <label for="message">Message <span>Plain text</span></label
+              ><textarea
+                id="message"
+                name="message"
+                placeholder="Write something worth opening…"
+                required
+                maxlength="10000"
+                rows="5"
+              ></textarea>
+              <label for="access-code"
+                >Demo password <span>Host-issued · kept in memory</span></label
+              ><input
+                id="access-code"
+                name="access-code"
+                type="password"
+                autocomplete="off"
+                required
+                minlength="32"
+                placeholder="Enter your demo password"
+              />
+              <p id="form-error" class="error" role="alert" hidden></p>
+              <button id="send" type="submit" disabled>
+                Send email <span aria-hidden="true">↗</span>
+              </button>
+              <p class="fine-print">
+                Six new sends per minute. Retries reuse the same request ID.
+              </p>
+            </form>
+          </section>
+          <aside class="tracking" aria-labelledby="tracking-title">
+            <div class="section-heading">
+              <h2 id="tracking-title">The journey</h2>
+              <span class="number">02 / TRACK</span>
+            </div>
+            <div id="status" aria-live="polite" aria-atomic="true">
+              <div class="stamp" aria-hidden="true">✉</div>
+              <p class="status-label">READY WHEN YOU ARE</p>
+              <h3>Waiting for your<br />first send.</h3>
+              <p class="status-description">
+                Submit a message to watch its live component state here.
+              </p>
+            </div>
+            <dl class="details">
+              <div>
+                <dt>Transport</dt>
+                <dd>Cloudflare REST</dd>
+              </div>
+              <div>
+                <dt>Durability</dt>
+                <dd>Convex component</dd>
+              </div>
+              <div>
+                <dt>Retry budget</dt>
+                <dd>3 attempts / 5 minutes</dd>
+              </div>
+            </dl>
+            <p class="delivery-note">
+              Accepted means Cloudflare accepted the request. Recipient delivery
+              updates require the authenticated Queue bridge and message
+              correlation.
+            </p>
+          </aside>
+        </div>
+      </main>
+      <footer>
+        <span>SMALL DEMO. REAL EMAIL.</span
+        ><a href="https://github.com/FantasticDevHQ/convex-cf-email-service"
+          >View the component <span aria-hidden="true">↗</span></a
+        >
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

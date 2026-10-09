@@ -111,6 +111,8 @@ See [the transport/state contract](docs/architecture.md),
 [the separately tracked Jib adoption plan](docs/adoption.md).
 The `example/` host and Worker are complete typechecked integration examples,
 with placeholder configuration and no deployed infrastructure.
+[Email Studio](example/README.md) adds a small Vite UI for real sends and live
+status. Run `pnpm --filter email-host-example dev` after following its host setup.
 
 Development:
 
