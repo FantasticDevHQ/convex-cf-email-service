@@ -102,5 +102,7 @@ do not send another real message or fabricate a delivery event for this ID.
 Bounce/complaint and reordered recipient transitions are verified with local
 fixtures; no actual bounce or complaint was induced against the live inbox.
 
-Package `0.3.0` is published; its successful release run is
-[37946970162](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37946970162).
+Package `0.4.0` is published; its successful release run is
+[37961851943](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37961851943).
+That release predates the runtime fix in PR #12. The isolated live Worker has
+the fix, but npm consumers need the next release after PR #12 merges.

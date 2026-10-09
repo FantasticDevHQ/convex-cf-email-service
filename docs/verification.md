@@ -83,10 +83,10 @@ existing redacted intent without additional schedules or content restoration,
 report changed payloads as conflicts, and reject new expired intents. The fix
 was merged and released in 0.2.2, so consumers on 0.2.2 or later receive it.
 
-Version 0.3.0 is now published from reviewed commit
+Version 0.3.0 was published from reviewed commit
 `93699d2f16fd113984ad0f770cfb9ba6fa9e8615`. Release run
 [37946970162](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37946970162)
-passed, and the npm registry reports 0.3.0 as the latest version. The isolated
+passed. The isolated
 live binding/Queue canary is tracked in [live-canary.md](./live-canary.md); its
 pending live evidence is separate from the component's automated tests.
 
@@ -95,7 +95,7 @@ remain rollout work. Missing ticket text is no longer an acceptance blocker.
 
 ## Workers runtime audit — 2026-10-09
 
-FANT-56 was reopened: npm 0.3.0 Queue forwarding uses `redirect: "error"`,
+FANT-56 was reopened: npm 0.3.0 and 0.4.0 Queue forwarding use `redirect: "error"`,
 which workerd rejects before fetch despite passing Node tests. The follow-up
 changes it to manual redirects with non-2xx rejection and adds a regression
 test in the actual Workers runtime. The isolated live Worker is already fixed:
@@ -103,3 +103,10 @@ synthetic forwarding, six-attempt exhaustion, DLQ recovery and durable duplicate
 ingestion passed. Merge/release of the package fix remains a gate. Real Gmail
 receipt and passing SPF/DKIM/DMARC are verified separately; provider-origin event
 publication/correlation remains unverified. See [live-canary.md](./live-canary.md).
+
+Release PR #11 published 0.4.0 from commit
+`0f6837ae887e48979ba13512e20e86661b59747a`. Main CI 37961852073 and
+[OIDC release run 37961851943](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37961851943)
+passed. The registry reports latest 0.4.0 with the matching gitHead, artifact
+signatures and SLSA provenance. PR #12 remains separate and must merge before
+the next release can include the Workers forwarding fix.
