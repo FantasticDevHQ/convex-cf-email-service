@@ -1,6 +1,6 @@
 {
   "name": "@fantastic.dev/convex-cf-email-service",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Reusable Convex email intent, host-owned Cloudflare transport and delivery tracking.",
   "license": "Apache-2.0",
   "keywords": [
