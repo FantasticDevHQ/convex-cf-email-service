@@ -15,7 +15,7 @@
     "prepack": "pnpm run build",
     "typecheck": "tsc --noEmit && tsc --noEmit -p example/convex && tsc --noEmit -p example/worker",
     "test": "vitest run",
-    "check": "pnpm run build && pnpm run typecheck && pnpm --filter email-host-example build && pnpm run test && node --test scripts/release-notes.test.mjs scripts/release-preflight.test.mjs scripts/github-release.test.mjs && node scripts/check-package.mjs && node scripts/check-readme-samples.mjs && node scripts/check-codegen-fresh.mjs",
+    "check": "pnpm run build && pnpm run typecheck && pnpm --filter email-host-example build && pnpm --filter email-host-example check:deployment && pnpm run test && node --test scripts/release-notes.test.mjs scripts/release-preflight.test.mjs scripts/github-release.test.mjs && node scripts/check-package.mjs && node scripts/check-readme-samples.mjs && node scripts/check-codegen-fresh.mjs",
     "check:consumer": "node scripts/clean-consumer.mjs",
     "codegen": "convex codegen --component-dir src/component",
     "format": "prettier --write src example scripts README.md docs package.json tsconfig*.json vitest*.ts"

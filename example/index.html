@@ -45,8 +45,7 @@
               <span class="number">01 / SEND</span>
             </div>
             <form id="compose-form">
-              <label for="recipient"
-                >To <span>Allowlisted recipient</span></label
+              <label for="recipient">To <span>Recipient address</span></label
               ><input
                 id="recipient"
                 name="recipient"
@@ -74,8 +73,7 @@
                 rows="5"
               ></textarea>
               <label for="access-code"
-                >Demo access code
-                <span>Host-issued · kept in memory</span></label
+                >Demo password <span>Host-issued · kept in memory</span></label
               ><input
                 id="access-code"
                 name="access-code"
@@ -83,7 +81,7 @@
                 autocomplete="off"
                 required
                 minlength="32"
-                placeholder="Enter your demo access code"
+                placeholder="Enter your demo password"
               />
               <p id="form-error" class="error" role="alert" hidden></p>
               <button id="send" type="submit" disabled>

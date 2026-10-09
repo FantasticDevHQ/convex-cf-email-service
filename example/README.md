@@ -43,13 +43,13 @@ shows setup instructions and disables sending. It never simulates success.
 Configure these **server-side Convex environment variables** for the selected
 local or development backend using its dashboard or `convex env set` workflow:
 
-| Variable                 | Value                                                        |
-| ------------------------ | ------------------------------------------------------------ |
-| `CLOUDFLARE_ACCOUNT_ID`  | Account with Cloudflare Email Service enabled                |
-| `CLOUDFLARE_EMAIL_TOKEN` | Cloudflare token authorized for that account's email sending |
-| `EMAIL_DEMO_FROM`        | Verified sender address                                      |
-| `EMAIL_DEMO_RECIPIENTS`  | Comma-separated, controlled recipient addresses              |
-| `EMAIL_DEMO_ACCESS_CODE` | Random operator access code, at least 32 characters          |
+| Variable                 | Value                                                                |
+| ------------------------ | -------------------------------------------------------------------- |
+| `CLOUDFLARE_ACCOUNT_ID`  | Account with Cloudflare Email Service enabled                        |
+| `CLOUDFLARE_EMAIL_TOKEN` | Cloudflare token authorized for that account's email sending         |
+| `EMAIL_DEMO_FROM`        | Verified sender address                                              |
+| `EMAIL_DEMO_RECIPIENTS`  | Comma-separated recipients, or `*` for password-authorized operators |
+| `EMAIL_DEMO_ACCESS_CODE` | Random operator access code, at least 32 characters                  |
 
 Use your secret manager; avoid placing secret values in shell history. Do not
 prefix any secret with `VITE_`: Vite exposes those variables in browser bundles.
@@ -57,7 +57,7 @@ The frontend needs only `VITE_CONVEX_URL`. Enter the host-issued access code in
 the password field; the app keeps it in memory and sends it to the authenticated
 host endpoints, without browser storage. Use HTTPS for any remote backend.
 
-Fill in an allowlisted recipient, a subject and a plain-text message, then click
+Fill in a permitted recipient, a subject and a plain-text message, then click
 **Send email**. These are real emails and may consume Cloudflare usage. The demo
 allows six new sends per minute across all operators, with three attempts and a
 five-minute expiry. A failed submission retry with unchanged content reuses its
@@ -84,9 +84,11 @@ require trusted host-side correlation as described in that guide; do not infer
 correlation from recipient or subject. An `ambiguous` send requires reconciliation,
 not an automatic replacement message.
 
-This change does not deploy infrastructure, configure Cloudflare, change secrets,
-or send test emails automatically. A live demo requires an operator to supply the
-above configuration and a controlled recipient.
+The deployed demo uses `EMAIL_DEMO_RECIPIENTS=*` by explicit operator choice, so
+password-authorized operators can send to any valid address. An unset or incorrect
+`EMAIL_DEMO_ACCESS_CODE` still denies both sends and status reads. To restrict
+recipients again, replace `*` with a comma-separated list. The application never
+sends test emails automatically.
 
 ## Verification
 
@@ -118,3 +120,52 @@ credentials for sending and delivery-event forwarding. The config contains
 placeholders and five Queue retries plus a DLQ. These files are typechecked but
 not deployed. Replace scope/source/endpoint mapping in host code for your app;
 do not expose source configuration or callback handles to browsers.
+
+## Hosted example and redeployment
+
+The example is hosted at https://cf-email.fantastic.dev. Its backend belongs to
+[Fantastic Dev / convex-cf-email-service](https://dashboard.convex.dev/t/fantastic-dev/convex-cf-email-service),
+with production URL `https://prestigious-lemur-549.convex.cloud`.
+`deployment.env` contains only the public deployment selector; it contains no secrets.
+
+The public page can be viewed by anyone, but sending and status access require
+its **Demo password**. The backend reads `EMAIL_DEMO_ACCESS_CODE`; the password
+is never embedded in frontend assets or saved in browser storage. The operator
+password is saved in 1Password as **cf-email.fantastic.dev demo password**. A
+64-character random password makes guessing impractical; retain the six-send rate
+limit even for authenticated operators. Do not use the email provider token as
+the demo password.
+
+Sending setup remains separate from website deployment. The current account has
+`mail.fantastic.dev` enabled for sending; `cf-email@fantastic.dev` requires its
+own verified sending domain or an operator-approved sender change. Configure a
+dedicated Email Sending token in the backend before testing real email delivery.
+
+From the repository root, with an authenticated Convex CLI:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm run build
+pnpm --filter email-host-example deploy:backend
+```
+
+This deploys the example host and both component mounts, then builds the Vite
+frontend using the target Convex URL. To publish the built frontend, inject the
+existing Cloudflare Workers deployment token and account ID from your secret
+manager into `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, then run:
+
+```sh
+pnpm --filter email-host-example deploy:site
+```
+
+`wrangler.jsonc` serves only the compiled static assets and attaches the
+`cf-email.fantastic.dev` custom domain. It disables alternate workers.dev and
+preview URLs. Deploy this configuration independently of `worker/wrangler.jsonc`,
+which is the email send/event bridge example and requires separate setup.
+Cloudflare creates the custom-domain DNS record and HTTPS certificate.
+
+`pnpm --filter email-host-example check:deployment` validates deployment packaging
+without publishing. This dry run is also part of the normal package CI checks.
+Always build through `deploy:backend` before publishing the site so the frontend
+uses the intended production backend. No provider tokens belong in Vite variables,
+`deployment.env`, Wrangler configuration, or the npm component.

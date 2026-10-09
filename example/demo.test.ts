@@ -104,3 +104,21 @@ test("demo cleanup retains recent references and removes them after 24 hours", a
   await t.mutation(anyApi.demo.cleanup, { id });
   expect(await t.run((ctx) => ctx.db.get(id))).toBeNull();
 });
+
+test("explicit wildcard permits any recipient only for authenticated operators", async () => {
+  const t = backend();
+  vi.stubEnv("EMAIL_DEMO_RECIPIENTS", "*");
+  await expect(
+    t.mutation(anyApi.demo.submit, {
+      ...input(),
+      recipient: "another@example.org",
+      accessCode: "wrong",
+    }),
+  ).rejects.toThrow("Demo access denied");
+  expect(
+    await t.mutation(anyApi.demo.submit, {
+      ...input(),
+      recipient: "another@example.org",
+    }),
+  ).toBeTruthy();
+});

@@ -31,7 +31,7 @@ export const submit = mutation({
       .split(",")
       .map((x) => x.trim().toLowerCase())
       .filter(Boolean);
-    if (!allowed.includes(recipient))
+    if (!allowed.includes("*") && !allowed.includes(recipient))
       throw new ConvexError("Recipient is not enabled for this demo");
     const from = process.env.EMAIL_DEMO_FROM;
     if (!from) throw new ConvexError("Demo sender is not configured");
