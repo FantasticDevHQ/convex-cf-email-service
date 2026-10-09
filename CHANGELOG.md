@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.3.0...v0.4.0) (2026-10-09)
+
+
+### Features
+
+* **example:** prepare isolated binding and queue canary ([53f2160](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/53f2160cde031e75f8b170dfd2dc94f7b221d9ed))
+* **example:** prepare isolated binding and Queue canary ([c70082a](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/c70082a4c3fa80da902a59a1e8b3dc605d5542b9))
+
 ## [0.3.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.2.2...v0.3.0) (2026-10-09)
 
 
