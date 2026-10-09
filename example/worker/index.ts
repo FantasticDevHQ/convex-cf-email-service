@@ -58,11 +58,31 @@ export default {
       subscriptionId: env.SUBSCRIPTION_ID,
       scope: "store",
     };
-    await forwardEvents(
+    const responseCounts: Record<string, number> = {};
+    const failureCounts: Record<string, number> = {};
+    const result = await forwardEvents(
       batch.messages,
       config,
       env.CONVEX_EVENTS_URL,
       env.EVENT_BRIDGE_SECRET,
+      async (input, init) => {
+        const response = await fetch(input, init);
+        const status = String(response.status);
+        responseCounts[status] = (responseCounts[status] ?? 0) + 1;
+        return response;
+      },
+      (reason) => {
+        failureCounts[reason] = (failureCounts[reason] ?? 0) + 1;
+      },
+    );
+    // Aggregate outcomes only: never log event bodies, recipient addresses or keys.
+    console.info(
+      JSON.stringify({
+        event: "email_queue_batch",
+        ...result,
+        responseCounts,
+        failureCounts,
+      }),
     );
   },
 };

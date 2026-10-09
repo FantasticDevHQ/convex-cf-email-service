@@ -138,30 +138,38 @@ export async function authenticatedBody(
   return JSON.parse(body) as unknown;
 }
 export type QueueMessage = { body: unknown; ack(): void; retry(): void };
+export type ForwardFailure =
+  "invalid_event" | "signing_failed" | "forward_failed";
 export async function forwardEvents(
   messages: readonly QueueMessage[],
   config: BridgeConfig,
   endpoint: string,
   secret: string,
   fetcher: typeof fetch = fetch,
+  onFailure?: (reason: ForwardFailure) => void,
 ): Promise<{ forwarded: number; retried: number }> {
   if (new URL(endpoint).protocol !== "https:")
     throw new Error("HTTPS endpoint required");
   let forwarded = 0,
     retried = 0;
   for (const message of messages) {
+    let reason: ForwardFailure = "invalid_event";
     try {
       const event = normalizeCloudflareEvent(message.body, config),
         body = JSON.stringify({ scope: config.scope, event }),
         timestamp = String(Date.now());
+      reason = "signing_failed";
+      const signature = await signBody(secret, timestamp, body);
+      reason = "forward_failed";
       const response = await fetcher(endpoint, {
         method: "POST",
-        redirect: "error",
+        // Workers supports manual/follow only; reject 3xx via response.ok below.
+        redirect: "manual",
         signal: AbortSignal.timeout(10000),
         headers: {
           "Content-Type": "application/json",
           "x-email-timestamp": timestamp,
-          "x-email-signature": await signBody(secret, timestamp, body),
+          "x-email-signature": signature,
         },
         body,
       });
@@ -171,6 +179,11 @@ export async function forwardEvents(
     } catch {
       message.retry();
       retried++;
+      try {
+        onFailure?.(reason);
+      } catch {
+        /* Diagnostics must not interrupt batch retries. */
+      }
     }
   }
   return { forwarded, retried };
