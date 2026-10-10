@@ -102,7 +102,80 @@ do not send another real message or fabricate a delivery event for this ID.
 Bounce/complaint and reordered recipient transitions are verified with local
 fixtures; no actual bounce or complaint was induced against the live inbox.
 
-Package `0.4.0` is published; its successful release run is
-[37961851943](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37961851943).
-That release predates the runtime fix in PR #12. The isolated live Worker has
-the fix, but npm consumers need the next release after PR #12 merges.
+Package `0.4.1` is published from release PR #13 and includes the Workers runtime
+fix from PR #12. [Main CI](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/38019833522)
+and [OIDC release/pre-publication checks](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/38019833870)
+passed. npm latest and the published gitHead match
+`472ec27e929d14dda14c2507501f8b12ec7af249`, with SLSA provenance.
+
+## Provider event investigation — 2026-10-10
+
+Read-only follow-up found no delayed provider event. Convex still has one accepted
+attempt for the original request and exactly two unmatched synthetic event records.
+The component has not silently applied or deduplicated a real event.
+
+- Subscription `687b1b24c10e4f3c92052beec357628e` remains enabled with exact
+  account/zone/subdomain, all six lifecycle types and the expected Queue ID.
+  Its creation at `2026-10-09T16:03:40.673Z` precedes the real send at 16:13:20Z.
+- The event Queue still has the correct Worker consumer, five retries and isolated
+  DLQ. REST realtime metrics report zero messages/bytes in both Queues. No consumer,
+  subscription or credentials were changed during this investigation.
+- Cloudflare's subdomain Activity log returns **No activity found** for both the
+  last 24 hours and last seven days. Its Overview shows sending Enabled and DNS
+  Configured, but the analytics chart also shows **No data available**.
+  This is separate from the previously verified Gmail receipt.
+- Historical Queue metrics are available in the dashboard. The last-24-hour event
+  Queue totals show nine ingested/written messages, nine deletes and 29 reads.
+  These aggregate counts alone do not identify message origin. The narrower
+  `2026-10-09T16:12:00Z`–`16:15:00Z` window around the 16:13:20Z real
+  send/receipt shows zero ingested, acknowledged or retried messages and zero
+  billable operations after the dashboard finished loading. No event reached
+  this Queue in that window; a delayed event outside it is not excluded by
+  that narrow measurement.
+- Existing deployment and DNS API tokens both lack zone Analytics Read. The
+  documented `emailSendingAdaptive` query therefore fails authorization. This
+  is an investigation access limitation, not proof that provider telemetry is
+  absent. Permissions were not expanded; dashboard results above remain distinct
+  evidence.
+
+The observed gap is upstream of durable Convex ingestion. Empty Queue/DLQ and
+absent provider activity, together with working synthetic forwarding, point toward
+Cloudflare sending telemetry/event publication or subdomain attribution. These
+observations do **not** establish the internal root cause. Do not weaken source
+validation, switch to apex subscriptions, alter DNS, synthesize a real-ID event,
+or send another real email to work around the gap.
+
+### Prepared Cloudflare support investigation (not submitted)
+
+Subject: Delivered Email Sending binding message absent from subdomain activity
+and enabled Queue event subscription
+
+Please trace the existing message through Email Sending analytics and event
+publication, and confirm whether its verified subdomain was attributed correctly.
+
+- Account: `c825b57320ccfc6c1fff4c6c840279d0`
+- Containing zone: `6d0d1d40f159f4d951851046253ea045`
+- Sending domain: `cf-email.fantastic.dev` only
+- Sending subdomain ID: `21e33a166ab34037a357364f4cd434e7`
+- Worker: `convex-cf-email-demo`, structured `EMAIL.send(payload)` binding
+- Sent/received: `2026-10-09T16:13:20Z`
+- Message-ID: `<S9jJxG1FTrjVeJ57BZQ13e5qA7xeqLngQgCF@cf-email.fantastic.dev>`
+- Subscription: `687b1b24c10e4f3c92052beec357628e`, enabled since 16:03:40Z
+- Destination Queue: `48528bd96c2647a596d245fc7c73f4f8`
+- DLQ: `4aa2ecff864049859334edca2baceb17`
+
+Gmail receipt with matching Message-ID and SPF/DKIM/DMARC pass was verified.
+The subscription includes delivered/deferred/bounced/failed/rejected/complained.
+The actual Queue/Worker/HMAC/Convex path forwards synthetic schema-v1 events,
+including retry/DLQ recovery and deduplication. No provider-origin event has been
+observed; subdomain Activity log is empty even after seven-day filtering.
+Please identify whether the lifecycle event was generated, which domain/zone it
+was attributed to, whether it matched this subscription, and any publication
+failure or supported replay mechanism. Please do not change any other domain,
+DNS record, credential or mail configuration.
+
+Reference contracts:
+[Email Sending event subscriptions](https://developers.cloudflare.com/email-service/platform/event-subscriptions/),
+[Email logs](https://developers.cloudflare.com/email-service/observability/logs/),
+[Email analytics](https://developers.cloudflare.com/email-service/observability/metrics-analytics/),
+[Queue metrics](https://developers.cloudflare.com/queues/observability/metrics/).
