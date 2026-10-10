@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.1](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.0...v0.4.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* support Workers Queue forwarding and verify isolated canary recovery ([730a7e0](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/730a7e0e59c3017256403f00f2e956760606aef9))
+
+
+### Documentation
+
+* distinguish 0.4.0 release from pending runtime fix ([97947ee](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/97947ee2b7f757ffe10cb4c03b8fc2daac742ae0))
+
+
+### Maintenance
+
+* sync release 0.4.0 into queue fix ([b0b3cd1](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/b0b3cd1f18b4b3ae109e58b689360df64ed99b72))
+
 ## [0.4.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.3.0...v0.4.0) (2026-10-09)
 
 
