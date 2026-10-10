@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.2](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.1...v0.4.2) (2026-10-10)
+
+
+### Documentation
+
+* reconcile verification overview with released live evidence ([a3a6819](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/a3a68197154b410e8e560da28466fc09e31da192))
+* record FANT-64 provider event investigation ([bdb5a62](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/bdb5a623fb07130cfb1f2ca09eda7c3de408e1e1))
+* verify real delivery and Queue event replay ([de3b85a](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/de3b85ab780113c661bc2879046339f29d45cf1d))
+* verify real email delivery and Queue event replay ([b71b531](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/b71b5319da4df8e1cce67f33f68bf1d7010144e5))
+
 ## [0.4.1](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.0...v0.4.1) (2026-10-09)
 
 
