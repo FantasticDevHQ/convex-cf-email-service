@@ -88,10 +88,11 @@ Version 0.3.0 was published from reviewed commit
 [37946970162](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37946970162)
 passed. The isolated
 live binding/Queue canary is tracked in [live-canary.md](./live-canary.md); its
-pending live evidence is separate from the component's automated tests.
+live evidence is separate from the component's automated tests.
 
-Separately authorized live infrastructure/provider canary and actual JIB integration
-remain rollout work. Missing ticket text is no longer an acceptance blocker.
+The separately authorized isolated live infrastructure/provider canary is now
+verified as recorded below. Actual JIB integration remains separately tracked
+rollout work. Missing ticket text is no longer an acceptance blocker.
 
 ## Workers runtime audit — 2026-10-09
 
@@ -100,13 +101,34 @@ which workerd rejects before fetch despite passing Node tests. The follow-up
 changes it to manual redirects with non-2xx rejection and adds a regression
 test in the actual Workers runtime. The isolated live Worker is already fixed:
 synthetic forwarding, six-attempt exhaustion, DLQ recovery and durable duplicate
-ingestion passed. Merge/release of the package fix remains a gate. Real Gmail
-receipt and passing SPF/DKIM/DMARC are verified separately; provider-origin event
-publication/correlation remains unverified. See [live-canary.md](./live-canary.md).
+ingestion passed. At this audit stage, merge/release and real provider event
+correlation remained gates. Both have since been verified below.
+See [live-canary.md](./live-canary.md).
 
 Release PR #11 published 0.4.0 from commit
 `0f6837ae887e48979ba13512e20e86661b59747a`. Main CI 37961852073 and
 [OIDC release run 37961851943](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/37961851943)
-passed. The registry reports latest 0.4.0 with the matching gitHead, artifact
-signatures and SLSA provenance. PR #12 remains separate and must merge before
-the next release can include the Workers forwarding fix.
+passed. That release did not yet contain the forwarding fix. PR #12 subsequently
+merged the fix, and PR #13 released it in 0.4.1.
+
+## Current release and live verification — 2026-10-10
+
+npm latest is **0.4.1**, from reviewed release commit
+`472ec27e929d14dda14c2507501f8b12ec7af249`, with matching registry gitHead
+and SLSA provenance. [Main CI](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/38019833522)
+and [OIDC release gates](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/38019833870)
+passed, including the Workers runtime regression and independent consumer checks.
+
+FANT-64's authorized canary to an operator-controlled mailbox outside the account's
+verified Routing destinations produced matching native binding acceptance, Gmail
+Inbox receipt, exact-subdomain Activity log and a real provider-origin Queue event.
+The event advanced the Convex recipient to `delivered`. Replay through the isolated
+Queue preserved one event and stable recipient state, incremented only the duplicate
+counter and caused no new send. The replay used a reconstructed envelope asserted
+to normalize exactly to the previously stored provider event; the original raw
+provider envelope was not retained. Detailed IDs, timestamps, counters and the
+recipient-dependent telemetry investigation are in [live-canary.md](./live-canary.md).
+
+All component tickets FANT-52–63 are Done. FANT-64's evidence documentation is in
+review in PR #14. No further runtime release is needed for these documentation
+updates. No other domain/email settings changed, and no Support request was sent.
