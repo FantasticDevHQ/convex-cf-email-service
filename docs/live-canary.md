@@ -47,8 +47,11 @@ zone; the sending domain and event subscription must remain the exact subdomain.
 - Check the inbox read-only and record Message-ID, arrival time, and SPF/DKIM/
   DMARC results. `delivered` means the recipient SMTP server accepted the email;
   the inbox check provides separate receipt evidence.
-- Replay the exact event through the isolated Queue. Verify one component
-  event and stable recipient state, with no additional provider send.
+- Replay the observed event through the isolated Queue. Verify one component
+  event and stable recipient state, with no additional provider send. Preserve
+  the original envelope when available. If only the normalized durable event
+  remains, explicitly label a reconstructed envelope and assert that its
+  normalization exactly equals the observed event before publishing it.
 - Use a clearly labeled synthetic event to exercise failed forwarding and
   recovery. Verify retry without acknowledgement, successful ingestion after
   recovery, and acknowledgement afterward. Exercise bounded exhaustion into
@@ -93,14 +96,12 @@ zone; the sending domain and event subscription must remain the exact subdomain.
   fixture also has exactly one record. Both stay unmatched, separate from the
   one real email/one accepted attempt.
 
-**Remaining gate:** no provider-origin lifecycle event for the real canary has
-been observed. Its Convex recipient remains `accepted`, even though Gmail receipt
-is verified. Synthetic ingestion is not proof of provider event publication,
-real-ID delivery correlation, or replay of that provider event. Investigate the
-enabled subscription with Cloudflare before claiming full live event verification;
-do not send another real message or fabricate a delivery event for this ID.
-Bounce/complaint and reordered recipient transitions are verified with local
-fixtures; no actual bounce or complaint was induced against the live inbox.
+At the end of this first run, no provider-origin event had been observed and
+its recipient remained `accepted`. Synthetic forwarding alone did not satisfy
+real delivery correlation. The separately authorized follow-up below resolves
+that observation for a recipient outside the account's verified destinations.
+Bounce/complaint and reordered transitions remain verified with local fixtures;
+no actual bounce or complaint was induced against the live inbox.
 
 Package `0.4.1` is published from release PR #13 and includes the Workers runtime
 fix from PR #12. [Main CI](https://github.com/FantasticDevHQ/convex-cf-email-service/actions/runs/38019833522)
@@ -108,74 +109,94 @@ and [OIDC release/pre-publication checks](https://github.com/FantasticDevHQ/conv
 passed. npm latest and the published gitHead match
 `472ec27e929d14dda14c2507501f8b12ec7af249`, with SLSA provenance.
 
-## Provider event investigation — 2026-10-10
+## Recipient-dependent event investigation — 2026-10-10
 
-Read-only follow-up found no delayed provider event. Convex still has one accepted
-attempt for the original request and exactly two unmatched synthetic event records.
-The component has not silently applied or deduplicated a real event.
+Two separately authorized sends to an existing, verified Email Routing destination
+arrived at Gmail with matching binding Message-IDs and passing SPF/DKIM/DMARC,
+but neither appeared in the sending subdomain's Activity log or durable events.
+The first message was subsequently found in Trash; the second had no Inbox label.
+Mailbox receipt, inbox placement and provider event publication are separate checks.
 
-- Subscription `687b1b24c10e4f3c92052beec357628e` remains enabled with exact
-  account/zone/subdomain, all six lifecycle types and the expected Queue ID.
-  Its creation at `2026-10-09T16:03:40.673Z` precedes the real send at 16:13:20Z.
-- The event Queue still has the correct Worker consumer, five retries and isolated
-  DLQ. REST realtime metrics report zero messages/bytes in both Queues. No consumer,
-  subscription or credentials were changed during this investigation.
-- Cloudflare's subdomain Activity log returns **No activity found** for both the
-  last 24 hours and last seven days. Its Overview shows sending Enabled and DNS
-  Configured, but the analytics chart also shows **No data available**.
-  This is separate from the previously verified Gmail receipt.
-- Historical Queue metrics are available in the dashboard. The last-24-hour event
-  Queue totals show nine ingested/written messages, nine deletes and 29 reads.
-  These aggregate counts alone do not identify message origin. The narrower
-  `2026-10-09T16:12:00Z`–`16:15:00Z` window around the 16:13:20Z real
-  send/receipt shows zero ingested, acknowledged or retried messages and zero
-  billable operations after the dashboard finished loading. No event reached
-  this Queue in that window; a delayed event outside it is not excluded by
-  that narrow measurement.
-- Existing deployment and DNS API tokens both lack zone Analytics Read. The
-  documented `emailSendingAdaptive` query therefore fails authorization. This
-  is an investigation access limitation, not proof that provider telemetry is
-  absent. Permissions were not expanded; dashboard results above remain distinct
-  evidence.
+The enabled subscription predates both sends. Read-only inspection confirmed the
+exact account/zone/subdomain, six event types, correct Queue/Worker consumer,
+five retries and isolated DLQ. A narrow Queue metrics window around the first
+send had zero ingestion. Existing API credentials lack Analytics Read, so the
+`emailSendingAdaptive` API query could not independently verify historical logs;
+permissions were not expanded. Other domains' visible logs contained unrelated
+messages, not either canary.
 
-The observed gap is upstream of durable Convex ingestion. Empty Queue/DLQ and
-absent provider activity, together with working synthetic forwarding, point toward
-Cloudflare sending telemetry/event publication or subdomain attribution. These
-observations do **not** establish the internal root cause. Do not weaken source
-validation, switch to apex subscriptions, alter DNS, synthesize a real-ID event,
-or send another real email to work around the gap.
+The deployed Worker source and binding settings confirm structured native
+`EMAIL.send(payload)` with the sender restricted to `demo@cf-email.fantastic.dev`.
+There is no external provider or fallback in this path. The returned binding
+Message-ID matches the received message. See Cloudflare's
+[Workers send API](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/).
 
-### Prepared Cloudflare support investigation (not submitted)
+Cloudflare documents that sending to verified destination addresses is free,
+including accounts configured only for Email Routing, and excluded from sending
+quota ([pricing](https://developers.cloudflare.com/email-service/platform/pricing/)).
+Its [event subscription contract](https://developers.cloudflare.com/email-service/platform/event-subscriptions/)
+distinguishes Email Sending events from Email Routing events. Neither statement
+promises that verified-destination sends appear in Email Sending telemetry.
+An independent [Mailda experiment](https://mailda.site/docs/receipts/email-sending-events/)
+reported the same recipient-dependent pattern. This is a troubleshooting clue,
+not a documented guarantee about Cloudflare's internal implementation.
 
-Subject: Delivered Email Sending binding message absent from subdomain activity
-and enabled Queue event subscription
+### Successful provider-origin delivery
 
-Please trace the existing message through Email Sending analytics and event
-publication, and confirm whether its verified subdomain was attributed correctly.
+The owner authorized one additional canary to an operator-controlled mailbox
+that is **not** a verified Routing destination. No domain, Routing destination,
+subscription, credentials or Worker settings changed between these tests.
 
-- Account: `c825b57320ccfc6c1fff4c6c840279d0`
-- Containing zone: `6d0d1d40f159f4d951851046253ea045`
-- Sending domain: `cf-email.fantastic.dev` only
-- Sending subdomain ID: `21e33a166ab34037a357364f4cd434e7`
-- Worker: `convex-cf-email-demo`, structured `EMAIL.send(payload)` binding
-- Sent/received: `2026-10-09T16:13:20Z`
-- Message-ID: `<S9jJxG1FTrjVeJ57BZQ13e5qA7xeqLngQgCF@cf-email.fantastic.dev>`
-- Subscription: `687b1b24c10e4f3c92052beec357628e`, enabled since 16:03:40Z
-- Destination Queue: `48528bd96c2647a596d245fc7c73f4f8`
-- DLQ: `4aa2ecff864049859334edca2baceb17`
+| Evidence                           | Observed value                                                     |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| Request UUID                       | `8fdae68f-701c-422f-9b92-8a0a94a9892f`                             |
+| Intent                             | `j971e022memdqm72aw104jnvt58g14v5`                                 |
+| Submitted                          | `2026-10-10T03:59:42.366Z`                                         |
+| Binding / Gmail / event Message-ID | `<ltBUBW1jljrl0zIdNxr2ustpjB59wpOtXTaV@cf-email.fantastic.dev>`    |
+| Provider event ID                  | `01a123f7-9022-7f82-85ed-f41889ad5d53`                             |
+| Delivered event timestamp          | `2026-10-10T03:59:50.009Z`                                         |
+| Durable event ingestion            | `2026-10-10T03:59:55.556Z`                                         |
+| Component event row                | `jd7771aex0eqs4cdqxx01d16158g0cr1`                                 |
+| Canonical event digest             | `8099754206209b261fb00f4efa50f67507404b6d6b48833db177e48942955311` |
 
-Gmail receipt with matching Message-ID and SPF/DKIM/DMARC pass was verified.
-The subscription includes delivered/deferred/bounced/failed/rejected/complained.
-The actual Queue/Worker/HMAC/Convex path forwards synthetic schema-v1 events,
-including retry/DLQ recovery and deduplication. No provider-origin event has been
-observed; subdomain Activity log is empty even after seven-day filtering.
-Please identify whether the lifecycle event was generated, which domain/zone it
-was attributed to, whether it matched this subscription, and any publication
-failure or supported replay mechanism. Please do not change any other domain,
-DNS record, credential or mail configuration.
+Before any operator replay, the event existed with `applied=true` and the matching
+recipient was `delivered`. The configured Queue/Worker/HMAC path therefore
+correlated a real provider-origin event with the accepted send. Gmail showed the
+message in Inbox with SPF, both sender-domain and Cloudflare DKIM, and DMARC
+passing. The subdomain's Activity log independently showed **Delivered** for the
+same subject, recipient and Message-ID after a short dashboard delay.
+The intent remains `accepted`; recipient delivery is tracked separately.
 
-Reference contracts:
-[Email Sending event subscriptions](https://developers.cloudflare.com/email-service/platform/event-subscriptions/),
-[Email logs](https://developers.cloudflare.com/email-service/observability/logs/),
-[Email analytics](https://developers.cloudflare.com/email-service/observability/metrics-analytics/),
-[Queue metrics](https://developers.cloudflare.com/queues/observability/metrics/).
+This controlled recipient change supports verified-destination handling as the
+explanation for the earlier missing telemetry. The provider's internal routing
+mechanism is still an inference. Keep a non-verified, operator-controlled
+recipient for lifecycle canaries; do not remove existing Routing destinations
+or alter mail settings to obtain logs.
+
+### Queue replay and deduplication
+
+At `2026-10-10T04:06:35.968Z`, the operator replayed the already observed event
+through the same isolated delivery Queue. The original acknowledged provider
+envelope was not retained. The replay envelope was reconstructed from the durable
+event plus the existing source/subscription metadata. Before enqueueing,
+`normalizeCloudflareEvent(reconstructed, config)` was asserted deeply equal to
+the stored event, including its original ID, Message-ID, recipient, timestamp,
+kind and permanence. This verifies exact **normalized event** replay, not
+byte-for-byte replay of the original provider envelope.
+
+Read-only before/after comparisons found all event and recipient rows unchanged:
+exactly one applied row for this real event, with the same digest, and the
+recipient still `delivered`. Today's `duplicate_events` increased from 0 to 1;
+`event_delivered` stayed 1 and `attempts` stayed 2 (the two authorized sends
+that day). The successful canary still has exactly one accepted attempt.
+Thus replay traversed Queue normalization and authenticated ingestion without
+adding an event, applying delivery twice, or causing another send.
+
+No new email was sent for replay. The two unmatched synthetic fixtures remain
+separate from the real provider event. The earlier retry exhaustion and DLQ
+recovery evidence above remains applicable; real duplicate replay verifies the
+successful path against an actual observed event identity.
+
+No Cloudflare Support request was submitted. The owner requested manual
+troubleshooting and prohibited contacting Support. This investigation changed
+no domain, DNS, mail routing, access or credential settings.
