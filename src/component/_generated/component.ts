@@ -73,6 +73,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             text?: string;
             to: Array<string>;
           };
+          redactOnTerminal?: boolean;
           scope: string;
           transport: string;
         },

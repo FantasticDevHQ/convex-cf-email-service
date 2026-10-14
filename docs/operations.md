@@ -1,13 +1,21 @@
 # Privacy, suppression and operations
 
-| Data                                                     | Retention                                                               |
-| -------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Subject, bodies, HTML links, base64 attachments, headers | Until absolute expiry; after terminal outcome, earliest of expiry or 1h |
-| Recipient rows and attempt audit rows                    | metadataDays, default 30, range 1–90                                    |
-| Pending/applied delivery events including recipient      | Fixed 30 days from ingestion                                            |
-| Dedup tombstone (scope/key/digest/state, no content)     | dedupDays, default 90, range metadataDays–365                           |
-| Operational daily metric counters                        | 91 days; queries limited to the last 90 days                            |
-| Scoped suppression recipient hash                        | Until an authorized host explicitly clears it                           |
+| Data                                                     | Retention                                                                                                           |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Subject, bodies, HTML links, base64 attachments, headers | Default: earliest of absolute expiry or 1h after terminal; opt-in `redactOnTerminal: true`: immediately at terminal |
+| Recipient rows and attempt audit rows                    | metadataDays, default 30, range 1–90                                                                                |
+| Pending/applied delivery events including recipient      | Fixed 30 days from ingestion                                                                                        |
+| Dedup tombstone (scope/key/digest/state, no content)     | dedupDays, default 90, range metadataDays–365                                                                       |
+| Operational daily metric counters                        | 91 days; queries limited to the last 90 days                                                                        |
+| Scoped suppression recipient hash                        | Until an authorized host explicitly clears it                                                                       |
+
+With `redactOnTerminal: true`, every terminal transition removes the entire
+payload in the same mutation, including subject, bodies, links, reply-to, headers
+and attachments. Safe retries retain content until terminal or expiry. Late
+acceptance reconciliation and delivery events can still update retained metadata.
+If an ambiguous intent was redacted, a later proven-not-sent reconciliation ends
+failed because its content cannot be retried; use a new business intent only
+after obtaining evidence that resubmission is safe. The default remains false.
 
 Retention uses durable callbacks and seven-day checkpoints that recheck deadlines.
 Expiry redacts stored payload regardless of send state. In-flight host actions may

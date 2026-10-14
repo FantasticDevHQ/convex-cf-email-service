@@ -10,6 +10,7 @@ export default defineSchema({
     transport: v.string(),
     handle: v.string(),
     payload: v.optional(payloadV),
+    redactOnTerminal: v.optional(v.boolean()),
     state: stateV,
     attempt: v.number(),
     maxAttempts: v.number(),

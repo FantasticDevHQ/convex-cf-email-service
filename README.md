@@ -75,6 +75,7 @@ export const enqueueReceipt = internalMutation({
       transport: "primary",
       send: internal.transport.send,
       expiresAt: Date.now() + 60 * 60 * 1000,
+      redactOnTerminal: true,
       payload: {
         from: "Example Store <receipts@example.com>",
         replyTo: "Example Support <support@example.com>",
@@ -85,6 +86,12 @@ export const enqueueReceipt = internalMutation({
     }),
 });
 ```
+
+Set `redactOnTerminal: true` to remove the entire stored payload atomically when
+an intent reaches a terminal outcome. Omit it to retain the existing policy
+(earliest of absolute expiry or one hour after terminal outcome). Retryable sends
+keep their payload until terminal or expiry. Metadata and deduplication remain.
+See [privacy and recovery tradeoffs](docs/operations.md).
 
 After mounting and adding the host files above, run Convex development to generate
 host bindings and sync the component with your development deployment:

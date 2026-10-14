@@ -14,7 +14,7 @@ export const send=internalAction({
 });
 export const create=internalMutation({args:{key:v.string()},returns:v.string(),handler:async(ctx,{key}):Promise<string>=>{
  const orderId=await ctx.db.insert('invoices',{amount:123});
- const id=await mail.enqueue(ctx,{scope:'independent-store',key,transport:'stub',send:internal.invoices.send,expiresAt:Date.now()+60000,payload:{from:'TinyDirs <support@mail-dev.tinydirs.dev>',replyTo:'TinyDirs <contact@tinydirs.dev>',to:['reader@example.net'],subject:'Invoice',text:'Amount: 123'}});
+ const id=await mail.enqueue(ctx,{scope:'independent-store',key,transport:'stub',send:internal.invoices.send,expiresAt:Date.now()+60000,redactOnTerminal:true,payload:{from:'TinyDirs <support@mail-dev.tinydirs.dev>',replyTo:'TinyDirs <contact@tinydirs.dev>',to:['reader@example.net'],subject:'Invoice',text:'Amount: 123'}});
  await ctx.db.patch(orderId,{emailId:id});return id;
 }});
 export const receive=internalMutation({args:{event:eventV},returns:v.string(),handler:async(ctx,{event}):Promise<string>=>await ctx.runMutation(components.mail.email.ingest,{scope:'independent-store',event})});

@@ -68,7 +68,10 @@ payload and transport alias. Reuse with different content/transport rejects;
 reuse with the same content returns the original ID and original policy, including
 a replay after the original send deadline or content redaction. Only new intents
 are subject to the current 24-hour expiry/policy admission checks. Changing
-expiry, attempt limits, retention or callback does not resurrect an old intent.
+expiry, attempt limits, retention, `redactOnTerminal` or callback does not resurrect an old intent.
+The optional `redactOnTerminal` policy is fixed at initial enqueue. When true,
+terminal transitions atomically remove payload; when omitted, existing expiry
+and one-hour terminal retention apply.
 After the dedup horizon a key may be reused; callers must choose a horizon matching
 their business replay window. Keys must be opaque identifiers, not email links,
 access tokens or sensitive subjects. There are no process-local dedup caches.

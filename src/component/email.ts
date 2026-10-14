@@ -63,12 +63,17 @@ async function terminal(
   email: Doc<"emails">,
   state: Doc<"emails">["state"],
 ) {
-  await ctx.db.patch(email._id, { state });
-  await ctx.scheduler.runAt(
-    Math.min(email.expiresAt, Date.now() + HOUR),
-    internal.email.redact,
-    { id: email._id },
-  );
+  await ctx.db.patch(email._id, {
+    state,
+    ...(email.redactOnTerminal ? { payload: undefined } : {}),
+  });
+  if (!email.redactOnTerminal) {
+    await ctx.scheduler.runAt(
+      Math.min(email.expiresAt, Date.now() + HOUR),
+      internal.email.redact,
+      { id: email._id },
+    );
+  }
   await metric(ctx, email.scope, state);
 }
 export const enqueue = mutation({
@@ -82,6 +87,7 @@ export const enqueue = mutation({
     maxAttempts: v.optional(v.number()),
     metadataDays: v.optional(v.number()),
     dedupDays: v.optional(v.number()),
+    redactOnTerminal: v.optional(v.boolean()),
   },
   returns: v.id("emails"),
   handler: async (ctx, a): Promise<Id<"emails">> => {
@@ -132,6 +138,7 @@ export const enqueue = mutation({
       transport: a.transport,
       handle: a.handle,
       payload: p,
+      ...(a.redactOnTerminal ? { redactOnTerminal: true } : {}),
       state: "queued",
       attempt: 0,
       maxAttempts: max,
@@ -571,7 +578,8 @@ export const reconcile = mutation({
     else if (a.decision.kind === "abandon") await terminal(ctx, e, "failed");
     else if (e.cancelRequested) await terminal(ctx, e, "cancelled");
     else if (Date.now() >= e.expiresAt) await terminal(ctx, e, "expired");
-    else if (e.attempt >= e.maxAttempts) await terminal(ctx, e, "failed");
+    else if (e.attempt >= e.maxAttempts || !e.payload)
+      await terminal(ctx, e, "failed");
     else {
       await ctx.db.patch(e._id, { state: "retrying", nextAt: Date.now() });
       await ctx.scheduler.runAfter(0, internal.dispatch.send, { id: e._id });
