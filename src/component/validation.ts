@@ -11,10 +11,55 @@ export function bounded(value: string, max = 256): string {
   return value;
 }
 export function address(value: string): string {
+  if (/[\r\n\0]/u.test(value)) throw new Error("Invalid email address");
   const s = value.trim().toLowerCase();
   if (s.length > 254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u.test(s))
     throw new Error("Invalid email address");
   return s;
+}
+// Single mailbox only: dot-atom address, optional phrase or quoted display name.
+// No comments, groups, address lists, quoted local parts or folded headers.
+export function mailbox(value: string): { address: string; name?: string } {
+  bounded(value, 998);
+  if (/[\x00-\x08\x0a-\x1f\x7f\u2028\u2029]/u.test(value))
+    throw new Error("Invalid mailbox");
+  const input = value.trim();
+  const match = /^(.*?)<([^<>]+)>$/u.exec(input);
+  const email = address(match ? match[2] : input);
+  const [local, domain] = email.split("@");
+  if (
+    local.length > 64 ||
+    !/^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+$/iu.test(local) ||
+    local.startsWith(".") ||
+    local.endsWith(".") ||
+    local.includes("..") ||
+    !domain
+      .split(".")
+      .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/iu.test(label))
+  )
+    throw new Error("Invalid mailbox");
+  if (!match) return { address: email };
+  const phrase = match[1].trim();
+  let name: string;
+  if (phrase.startsWith('"')) {
+    if (!/^"(?:[^"\\]|\\["\\])*"$/u.test(phrase))
+      throw new Error("Invalid mailbox");
+    name = phrase.slice(1, -1).replace(/\\(["\\])/gu, "$1");
+  } else {
+    if (/[()<>\[\]:;@\\",]/u.test(phrase)) throw new Error("Invalid mailbox");
+    name = phrase.replace(/[ \t]+/gu, " ");
+  }
+  if (!name.trim()) throw new Error("Invalid mailbox");
+  return { address: email, name };
+}
+function canonicalMailbox(value: string): string {
+  const { address, name } = mailbox(value);
+  return bounded(
+    name === undefined
+      ? address
+      : `"${name.replace(/["\\]/gu, "\\$&")}" <${address}>`,
+    998,
+  );
 }
 export function normalize(payload: EmailPayload): EmailPayload {
   const recipients = (a: string[] | undefined) =>
@@ -61,13 +106,14 @@ export function normalize(payload: EmailPayload): EmailPayload {
   );
   if (Object.keys(headers).length > 20) throw new Error("Too many headers");
   const p: EmailPayload = {
-    from: address(payload.from),
+    from: canonicalMailbox(payload.from),
     to,
     subject: payload.subject,
   };
   if (cc.length) p.cc = cc;
   if (bcc.length) p.bcc = bcc;
-  if (payload.replyTo) p.replyTo = address(payload.replyTo);
+  if (payload.replyTo !== undefined)
+    p.replyTo = canonicalMailbox(payload.replyTo);
   if (payload.text) p.text = payload.text;
   if (payload.html) p.html = payload.html;
   if (Object.keys(headers).length) p.headers = headers;

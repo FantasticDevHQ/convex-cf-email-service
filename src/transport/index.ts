@@ -4,9 +4,18 @@ import type {
   EmailPayload,
   TransportResult,
 } from "../component/shared.js";
-import { allRecipients, normalize, bounded } from "../component/validation.js";
+import {
+  allRecipients,
+  normalize,
+  bounded,
+  mailbox,
+} from "../component/validation.js";
+export type BindingPayload = Omit<EmailPayload, "from" | "replyTo"> & {
+  from: string | { email: string; name: string };
+  replyTo?: string | { email: string; name: string };
+};
 export interface EmailBinding {
-  send(payload: EmailPayload): Promise<{ messageId: string }>;
+  send(payload: BindingPayload): Promise<{ messageId: string }>;
 }
 export async function sendBinding(
   binding: EmailBinding,
@@ -21,7 +30,16 @@ export async function sendBinding(
     return { kind: "not_sent", retryable: false, code: "rejected" };
   }
   try {
-    const result = await binding.send(payload);
+    const { from, replyTo, ...body } = payload;
+    const named = (value: string): BindingPayload["from"] => {
+      const { address: email, name } = mailbox(value);
+      return name === undefined ? email : { email, name };
+    };
+    const result = await binding.send({
+      ...body,
+      from: named(from),
+      ...(replyTo === undefined ? {} : { replyTo: named(replyTo) }),
+    });
     bounded(result.messageId);
     return {
       kind: "accepted",
@@ -83,7 +101,11 @@ export async function sendRest(
   } catch {
     return { kind: "not_sent", retryable: false, code: "rejected" };
   }
-  const { replyTo, attachments, ...body } = p;
+  const { from, replyTo, attachments, ...body } = p;
+  const named = (value: string) => {
+    const parsed = mailbox(value);
+    return parsed.name === undefined ? parsed.address : parsed;
+  };
   try {
     const response = await fetcher(
       `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/email/sending/send`,
@@ -97,7 +119,8 @@ export async function sendRest(
         },
         body: JSON.stringify({
           ...body,
-          ...(replyTo ? { reply_to: replyTo } : {}),
+          from: named(from),
+          ...(replyTo ? { reply_to: named(replyTo) } : {}),
           ...(attachments
             ? {
                 attachments: attachments.map(({ contentId, ...a }) => ({

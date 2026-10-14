@@ -4,9 +4,9 @@ A reusable Convex component for durable transactional email intent and Cloudflar
 Email Service delivery tracking. Owned by Fantastic Dev HQ. Apache-2.0; derived
 from a pinned ezyyeah revision recorded in [UPSTREAM.md](UPSTREAM.md).
 
-Prepared package: `@fantastic.dev/convex-cf-email-service`. **Not published yet.**
+npm package: `@fantastic.dev/convex-cf-email-service`.
 
-Install the published version after release, or install a local `npm pack` tarball
+Install the published version, or install a local `npm pack` tarball
 for evaluation. Requires Node 24.19+, Convex 1.44+, and pnpm 11.18 for development.
 
 Mount the component in your host app (`convex/convex.config.ts`):
@@ -69,7 +69,8 @@ export const enqueueReceipt = internalMutation({
       send: internal.transport.send,
       expiresAt: Date.now() + 60 * 60 * 1000,
       payload: {
-        from: "receipts@example.com",
+        from: "Example Store <receipts@example.com>",
+        replyTo: "Example Support <support@example.com>",
         to: [recipient],
         subject: "Receipt",
         text: "Your order was received.",
@@ -100,7 +101,20 @@ component's idempotency key.
 Payloads include text/HTML, to/cc/bcc, replyTo, X- headers, and base64 attachments.
 The component limits serialized content to 256 KiB, 50 distinct recipients and
 32 attachments so enqueue is atomic. It normalizes addresses to lowercase and
-sorts recipients for deduplication. Consumers needing case-sensitive local parts
+sorts recipients for deduplication. `from` and `replyTo` accept a bare address or
+a single branded mailbox such as `TinyDirs <support@example.com>`. Display names
+retain their case and Unicode; names with commas, quotes or backslashes must use
+a quoted phrase with escaped quotes/backslashes. Normalization quotes display
+names consistently, so equivalent quoting and address case reuse an idempotency
+key; changing the display name conflicts. Both transports preserve the name using
+Cloudflare named-address objects, with `email` for Workers and `address` for REST.
+To/cc/bcc and suppression keys remain bare addresses. Mailboxes are limited to
+998 characters after canonicalization and support dot-atom addresses with DNS
+domains. Comments, groups, lists, quoted local parts, CR/LF/NUL and folded headers
+are rejected without including input in errors.
+See Cloudflare's [mailbox contracts](https://developers.cloudflare.com/email-service/examples/email-sending/recipients/)
+and [REST address type](https://github.com/cloudflare/cloudflare-typescript/blob/main/src/resources/email-sending/email-sending.ts).
+Consumers needing case-sensitive local parts
 or larger messages should use a separately reviewed extension. All recipients
 are blocked if any is suppressed; the component never silently changes an intent.
 

@@ -575,3 +575,38 @@ test("new intent still rejects an expired send deadline", async () => {
     0,
   );
 });
+
+test("branded enqueue replays equivalent mailbox formatting and conflicts on changed branding", async () => {
+  const t = convexTest(schema, modules),
+    a = request();
+  const payload = {
+    ...a.payload,
+    from: "TinyDirs <SUPPORT@MAIL-DEV.TINYDIRS.DEV>",
+    replyTo: "TinyDirs <CONTACT@TINYDIRS.DEV>",
+  };
+  const id = await t.mutation(anyApi.email.enqueue, { ...a, payload });
+  expect(
+    await t.mutation(anyApi.email.enqueue, {
+      ...a,
+      payload: {
+        ...payload,
+        from: '"TinyDirs" <support@mail-dev.tinydirs.dev>',
+        replyTo: '"TinyDirs" <contact@tinydirs.dev>',
+      },
+    }),
+  ).toBe(id);
+  await expect(
+    t.mutation(anyApi.email.enqueue, {
+      ...a,
+      payload: { ...payload, replyTo: "Another Brand <contact@tinydirs.dev>" },
+    }),
+  ).rejects.toThrow("Idempotency conflict");
+  const claim = await t.mutation(anyApi.email.claim, { id });
+  expect(claim.request.payload).toMatchObject({
+    from: '"TinyDirs" <support@mail-dev.tinydirs.dev>',
+    replyTo: '"TinyDirs" <contact@tinydirs.dev>',
+  });
+  expect(
+    await t.run((ctx) => ctx.db.query("recipients").collect()),
+  ).toMatchObject([{ recipient: "a@example.net" }]);
+});
