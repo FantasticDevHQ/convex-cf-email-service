@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.3](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.2...v0.4.3) (2026-10-14)
+
+
+### Bug Fixes
+
+* support branded sender and reply-to mailboxes ([d4592c6](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/d4592c68c9e8b932345cf294e7c84f3d2db7827c))
+* support branded sender and reply-to mailboxes ([a41827b](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/a41827bb5be8f88094cf9973453331c803127f84))
+
+
+### Documentation
+
+* lead with published npm installation and usage ([9b941f3](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/9b941f3b02a87f60d00c4345a03964354f3fee68))
+
 ## [0.4.2](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.1...v0.4.2) (2026-10-10)
 
 
