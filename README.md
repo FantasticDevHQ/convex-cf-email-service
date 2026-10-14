@@ -142,6 +142,7 @@ are blocked if any is suppressed; the component never silently changes an intent
 
 See [the transport/state contract](docs/architecture.md),
 [Queue setup and authentication](docs/events.md),
+[multi-mount event ownership routing](docs/multi-mount-routing.md),
 [retention and operations](docs/operations.md),
 [release bootstrap](docs/releasing.md), and
 [the separately tracked Jib adoption plan](docs/adoption.md).

@@ -39,6 +39,13 @@ scope. The sample supports two accepted host keys; don't persist them in compone
 configuration. The send bridge uses a different key; coordinate its host/Worker
 rotation and treat an uncertain submission response as ambiguous.
 
+For multiple mounts sharing a subscription, use the supported
+[host ownership-routing contract](./multi-mount-routing.md) and
+`routeDeliveryEvent` from `/bridge`. Resolve a durable receipt by the exact
+provider Message-ID before invoking one owning mount. Unknown ownership must
+retry; never broadcast an event to all mounts or assume an unrelated pending
+write proves ownership.
+
 Each Queue message is acknowledged only after the host responds 2xx following
 a committed ingestion mutation. Network failure, host 401/503, unsupported schema
 or malformed event is retried. Poison messages eventually enter the configured

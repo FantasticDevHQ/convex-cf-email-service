@@ -188,3 +188,52 @@ export async function forwardEvents(
   }
   return { forwarded, retried };
 }
+
+// The host persists immutable receipts in a source-pinned namespace. No component
+// probing or provider resubmission is permitted during event routing.
+export type EventOwnershipReceipt =
+  | { kind: "component"; route: string; expiresAt: number }
+  | { kind: "legacy"; expiresAt: number };
+export type EventIngestResult = "applied" | "pending" | "duplicate";
+export type EventRoutingResult = EventIngestResult | "legacy" | "unknown_owner";
+export async function routeDeliveryEvent(
+  event: DeliveryEvent,
+  lookup: (messageId: string) => Promise<EventOwnershipReceipt | null>,
+  ingest: (route: string, event: DeliveryEvent) => Promise<EventIngestResult>,
+): Promise<EventRoutingResult> {
+  if (
+    ![
+      "delivered",
+      "deferred",
+      "bounced",
+      "failed",
+      "rejected",
+      "complained",
+    ].includes(event.kind) ||
+    typeof event.permanent !== "boolean"
+  )
+    throw new Error("Invalid delivery event");
+  // Do not pass unrecognized fields or message content to the host callback.
+  const normalized = normalizedEvent({
+    eventId: event.eventId,
+    messageId: event.messageId,
+    recipient: event.recipient,
+    kind: event.kind,
+    at: event.at,
+    permanent: event.permanent,
+  });
+  const receipt = await lookup(normalized.messageId);
+  if (receipt === null) return "unknown_owner";
+  if (
+    !["component", "legacy"].includes(receipt.kind) ||
+    !Number.isFinite(receipt.expiresAt)
+  )
+    throw new Error("Invalid ownership receipt");
+  if (receipt.expiresAt <= Date.now()) return "unknown_owner";
+  if (receipt.kind === "legacy") return "legacy";
+  bounded(receipt.route);
+  const result = await ingest(receipt.route, normalized);
+  if (!["applied", "pending", "duplicate"].includes(result))
+    throw new Error("Invalid ingestion result");
+  return result;
+}

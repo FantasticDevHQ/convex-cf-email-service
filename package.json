@@ -13,7 +13,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "prepack": "pnpm run build",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p example/convex && tsc --noEmit -p example/worker",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p example/convex && tsc --noEmit -p example/worker && tsc --noEmit -p example/routing",
     "test": "vitest run",
     "check": "pnpm run build && pnpm run typecheck && pnpm --filter email-host-example build && pnpm --filter email-host-example check:deployment && pnpm run test && node --test example/worker-runtime.test.mjs scripts/release-notes.test.mjs scripts/release-preflight.test.mjs scripts/github-release.test.mjs && node scripts/check-package.mjs && node scripts/check-readme-samples.mjs && node scripts/check-codegen-fresh.mjs",
     "check:consumer": "node scripts/clean-consumer.mjs",
