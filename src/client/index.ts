@@ -38,6 +38,7 @@ export class CloudflareEmail {
       maxAttempts?: number;
       metadataDays?: number;
       dedupDays?: number;
+      redactOnTerminal?: boolean;
     },
   ) {
     const { send, ...rest } = options;
