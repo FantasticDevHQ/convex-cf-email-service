@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.3...v0.5.0) (2026-10-14)
+
+
+### Features
+
+* support immediate terminal payload redaction (OSS-2) ([ef6ac2b](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/ef6ac2b00d4dfa6d9b33c2eadb574c8f1a2ade8d))
+* support immediate terminal payload redaction (OSS-2) ([5cc4423](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/5cc4423cf02e6a97f0333b5bf3f020116dd86dd9))
+
 ## [0.4.3](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.2...v0.4.3) (2026-10-14)
 
 
