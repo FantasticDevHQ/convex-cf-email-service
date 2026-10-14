@@ -4,10 +4,17 @@ A reusable Convex component for durable transactional email intent and Cloudflar
 Email Service delivery tracking. Owned by Fantastic Dev HQ. Apache-2.0; derived
 from a pinned ezyyeah revision recorded in [UPSTREAM.md](UPSTREAM.md).
 
-npm package: `@fantastic.dev/convex-cf-email-service`.
+Published on npm as
+[@fantastic.dev/convex-cf-email-service](https://www.npmjs.com/package/@fantastic.dev/convex-cf-email-service).
 
-Install the published version, or install a local `npm pack` tarball
-for evaluation. Requires Node 24.19+, Convex 1.44+, and pnpm 11.18 for development.
+Install it in your existing Convex app:
+
+```sh
+npm install @fantastic.dev/convex-cf-email-service
+```
+
+With pnpm, use `pnpm add @fantastic.dev/convex-cf-email-service`.
+The package requires Convex 1.44+ and Node 24.19+.
 
 Mount the component in your host app (`convex/convex.config.ts`):
 
@@ -79,7 +86,15 @@ export const enqueueReceipt = internalMutation({
 });
 ```
 
-Run host codegen after mounting. `ComponentApi` is exported through
+After mounting and adding the host files above, run Convex development to generate
+host bindings and sync the component with your development deployment:
+
+```sh
+npx convex dev
+```
+
+Use your app's normal `npx convex deploy` workflow when ready to deploy.
+`ComponentApi` is exported through
 `@fantastic.dev/convex-cf-email-service/_generated/component.js`; the portable
 convex-test registration is exported through `/test`.
 
@@ -127,6 +142,10 @@ The `example/` host and Worker are complete typechecked integration examples,
 with placeholder configuration and no deployed infrastructure.
 [Email Studio](example/README.md) adds a small Vite UI for real sends and live
 status. Run `pnpm --filter email-host-example dev` after following its host setup.
+
+To work on this repository, use Node 24.19+ and pnpm 11.18. Local tarballs from
+`npm pack` are for testing unreleased changes; consumers should install from npm
+using the instructions above.
 
 Development:
 
