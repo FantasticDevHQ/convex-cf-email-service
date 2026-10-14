@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.5.0...v0.6.0) (2026-10-14)
+
+
+### Features
+
+* support host-owned delivery event routing (OSS-3) ([8a9a183](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/8a9a18392d6887812e13ab12c075f23672c2c51b))
+* support host-owned delivery event routing (OSS-3) ([85e09ed](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/85e09ed3745225fc7f301bbdf7c747816df9cc31))
+
 ## [0.5.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.4.3...v0.5.0) (2026-10-14)
 
 
