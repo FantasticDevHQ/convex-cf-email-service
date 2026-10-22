@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.1](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.6.0...v0.6.1) (2026-10-22)
+
+
+### Maintenance
+
+* bump Node.js to 24.22.1 ([27d9050](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/27d9050c9b5637032b501ad7198a02b4291738f9))
+* bump Node.js to 24.22.1 ([e28cba4](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/e28cba42945b3df0c421b8f9ea763277547487e6))
+
 ## [0.6.0](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.5.0...v0.6.0) (2026-10-14)
 
 
