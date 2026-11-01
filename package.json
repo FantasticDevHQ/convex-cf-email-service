@@ -14,11 +14,20 @@
     "build": "node scripts/build.mjs",
     "prepack": "pnpm run build",
     "typecheck": "tsc --noEmit && tsc --noEmit -p example/convex && tsc --noEmit -p example/worker && tsc --noEmit -p example/routing",
-    "test": "vitest run",
+    "test": "vitest run --maxWorkers=1",
     "check": "pnpm run build && pnpm run typecheck && pnpm --filter email-host-example build && pnpm --filter email-host-example check:deployment && pnpm run test && node --test example/worker-runtime.test.mjs scripts/release-notes.test.mjs scripts/release-preflight.test.mjs scripts/github-release.test.mjs && node scripts/check-package.mjs && node scripts/check-readme-samples.mjs && node scripts/check-codegen-fresh.mjs",
     "check:consumer": "node scripts/clean-consumer.mjs",
     "codegen": "convex codegen --component-dir src/component",
-    "format": "prettier --write src example scripts README.md docs package.json tsconfig*.json vitest*.ts"
+    "format": "prettier --write src example scripts README.md docs package.json tsconfig*.json vitest*.ts",
+    "worktree:setup": "node scripts/worktree/cli.mjs setup",
+    "worktree:start": "node scripts/worktree/cli.mjs start",
+    "worktree:stop": "node scripts/worktree/cli.mjs stop",
+    "worktree:teardown": "node scripts/worktree/cli.mjs teardown",
+    "worktree:cleanup": "node scripts/worktree/cli.mjs cleanup",
+    "worktree:prune": "node scripts/worktree/cli.mjs prune",
+    "test:pr-standard": "node --test --test-concurrency=1 scripts/pr-standard.test.mjs scripts/enforce-pr-standard.test.mjs",
+    "test:worktree": "node --test --test-concurrency=1 scripts/worktree/*.test.mjs",
+    "test:worktree:integration": "node --test --test-concurrency=1 scripts/worktree/worktree.integration.mjs"
   },
   "files": [
     "dist",

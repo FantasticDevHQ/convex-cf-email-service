@@ -1,0 +1,12 @@
+{
+  "backend": ".",
+  "frontend": "example",
+  "baseBranch": "main",
+  "env": {},
+  "secretEnv": [
+    "EMAIL_BRIDGE_SECRET"
+  ],
+  "siteUrlEnv": [],
+  "bootstrapMissingEnv": [],
+  "frontendFramework": "vite"
+}

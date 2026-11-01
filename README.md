@@ -170,3 +170,9 @@ samples in an isolated app, and compares isolated generated bindings.
 runs anonymous local codegen/typecheck, exercises a real local host callback and
 event, then tests early/duplicate events and two component mounts with convex-test.
 No Cloudflare credentials or live email send are used in these gates.
+
+[A Fantastic.Dev Project](https://fantastic.dev)
+
+[![Fantastic.Dev](https://raw.githubusercontent.com/FantasticDevHQ/convex-worktrees/52c0b76d960a98afedd48607d6737bc14a954c1e/assets/fantastic-dev-logo.svg)](https://fantastic.dev) [![Fantastic.Dev project](https://raw.githubusercontent.com/FantasticDevHQ/convex-worktrees/52c0b76d960a98afedd48607d6737bc14a954c1e/assets/fantastic-dev-badge.svg)](https://fantastic.dev)
+
+See [local worktrees](docs/worktrees.md) and [pull request standards](docs/pull-request-standard.md).
