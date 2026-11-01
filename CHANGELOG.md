@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.2](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.6.1...v0.6.2) (2026-11-01)
+
+
+### Maintenance
+
+* FANT-91 adopt shared repository standards ([#26](https://github.com/FantasticDevHQ/convex-cf-email-service/issues/26)) ([f4bf837](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/f4bf83702a14d5cc356893de46ad0b6b83c46eb3))
+
+
+### Continuous Integration
+
+* FANT-91 publish required branch protection checks ([#28](https://github.com/FantasticDevHQ/convex-cf-email-service/issues/28)) ([1c90068](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/1c90068e92a7a7ae496a8c32ef055d795e28ceba))
+
 ## [0.6.1](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.6.0...v0.6.1) (2026-10-22)
 
 
