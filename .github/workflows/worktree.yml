@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lifecycle:
+    name: Real app backend isolation
     runs-on: ubicloud-standard-2-ubuntu-2404
     timeout-minutes: 40
     env:

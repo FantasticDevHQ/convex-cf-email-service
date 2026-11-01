@@ -40,3 +40,15 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check:consumer
+  quality-gates:
+    name: Repository quality gates
+    needs: [check, clean-consumer]
+    if: always()
+    runs-on: ubicloud-standard-2-ubuntu-2404
+    timeout-minutes: 5
+    steps:
+      - name: Require every repository quality check
+        env:
+          PACKAGE_RESULT: ${{ needs.check.result }}
+          CONSUMER_RESULT: ${{ needs.clean-consumer.result }}
+        run: test "$PACKAGE_RESULT" = success && test "$CONSUMER_RESULT" = success
