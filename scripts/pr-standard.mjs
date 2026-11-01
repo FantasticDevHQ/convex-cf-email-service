@@ -175,6 +175,7 @@ function uiEvidenceErrors(text, files) {
 }
 
 export function validatePullRequest({ title = "", body = "" }, files = []) {
+  body = (body ?? "").replace(/\r\n?/g, "\n");
   const errors = [];
   if (!titlePattern.test(title.trim()))
     errors.push(

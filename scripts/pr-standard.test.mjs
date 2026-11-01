@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { validatePullRequest } from "./pr-standard.mjs";
@@ -303,3 +304,24 @@ test("requires a UI declaration and uploaded screenshot or video for UI changes"
     [],
   );
 });
+
+for (const [name, newline] of [["LF", "\n"], ["CRLF", "\r\n"], ["lone CR", "\r"]]) {
+  test(`valid and invalid metadata with ${name} line endings`, () => {
+    const normalized = body.replace(/\r\n|\r|\n/g, newline);
+    assert.deepEqual(validatePullRequest({ title: "ci: JIF-65 enforce PR standards", body: normalized }), []);
+    assert.ok(validatePullRequest({ title: "ci: missing ticket", body: normalized }).length);
+  });
+}
+
+const event = process.env.GITHUB_EVENT_PATH
+  ? JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"))
+  : {};
+for (const [name, newline] of [["LF", "\n"], ["CRLF", "\r\n"], ["lone CR", "\r"]]) {
+  test(`actual PR event metadata accepts ${name} and rejects invalid variants`, { skip: !event.pull_request }, () => {
+    const pr = event.pull_request;
+    const metadata = { title: pr.title, body: pr.body.replace(/\r\n|\r|\n/g, newline) };
+    assert.deepEqual(validatePullRequest(metadata), []);
+    assert.ok(validatePullRequest({ ...metadata, title: "chore: missing ticket" }).length);
+    assert.ok(validatePullRequest({ ...metadata, body: "## Summary" }).length);
+  });
+}
