@@ -1,0 +1,11 @@
+// Copied only into disposable local integration worktrees. Never deploy publicly.
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
+export const write = mutation({
+  args: { value: v.string() },
+  handler: async (ctx, args) => ctx.db.insert("orders", { total: args.value === "alpha" ? 1 : 2 }),
+});
+export const read = query({
+  args: {},
+  handler: async (ctx) => (await ctx.db.query("orders").collect()).map(row => ({ value: row.total === 1 ? "alpha" : "beta" })),
+});
