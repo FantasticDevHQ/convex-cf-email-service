@@ -11,7 +11,7 @@ import { packageBin } from "./dependencies.mjs";
 
 export async function main() {
   const command = process.argv[2];
-  if (layout.convex === false && ["start", "stop", ...(layout.frontendFramework === "vite" ? ["--host", "127.0.0.1", "--strictPort"] : ["dev"]), "backend", "frontend", "_serve"].includes(command)) {
+  if (layout.convex === false && ["start", "stop", "dev", "backend", "frontend", "_serve"].includes(command)) {
     await state();
     if (!["start", "stop"].includes(command) || process.argv.includes("--frontend"))
       throw new Error("No development services are configured with convex:false. Run development commands directly in this checkout.");
