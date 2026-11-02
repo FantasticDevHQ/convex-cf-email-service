@@ -1,6 +1,7 @@
 name: Worktree toolkit
 on:
   pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
   workflow_dispatch:
