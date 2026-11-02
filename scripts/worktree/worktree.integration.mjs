@@ -29,7 +29,16 @@ function run(cwd, args) {
 }
 async function ok(cwd, ...args) {
   const r = await run(cwd, args);
-  assert.equal(r.code, 0, r.output.slice(-8000));
+  if (r.code !== 0) {
+    // Preserve diagnostics before teardown removes disposable checkout logs.
+    let diagnostic = await readFile(path.join(cwd, ".worktree/backend.log"), "utf8").catch(() => "");
+    const config = await readFile(path.join(cwd, backendPath, ".convex/local/default/config.json"), "utf8").then(JSON.parse).catch(() => ({}));
+    const env = await readFile(path.join(cwd, ".worktree/backend.env"), "utf8").catch(() => "");
+    const secrets = [config.adminKey, ...env.split("\n").map((line) => line.slice(line.indexOf("=") + 1))].filter(Boolean);
+    for (const secret of secrets) diagnostic = diagnostic.replaceAll(secret, "[redacted]");
+    r.output += `\nBackend log:\n${diagnostic.slice(-8000)}`;
+  }
+  assert.equal(r.code, 0, r.output.slice(-16000));
   return r;
 }
 async function rpc(s, kind, fn, args = {}) {
