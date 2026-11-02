@@ -6,11 +6,7 @@
 
 <p align="center"><strong>Durable transactional email for Convex, delivered with Cloudflare Email Service.</strong></p>
 
-<div align="center">
-
-[A Fantastic.Dev Project](https://fantastic.dev)
-
-</div>
+<p align="center">A <a href="https://fantastic.dev">Fantastic.Dev</a> Project</p>
 
 <p align="center">
   <a href="https://fantastic.dev"><img src="https://img.shields.io/badge/Fantastic.dev-94C173?style=for-the-badge&amp;logoColor=0c0e13" alt="Visit Fantastic.Dev" /></a>
@@ -27,6 +23,8 @@
   <a href="https://github.com/FantasticDevHQ/convex-cf-email-service/stargazers"><img src="https://img.shields.io/github/stars/FantasticDevHQ/convex-cf-email-service?style=flat-square" alt="GitHub stars" /></a>
 </p>
 
+<p align="center"><a href="#quick-start">Quick start</a> · <a href="#have-my-agent-set-this-up">Agent setup</a> · <a href="#documentation">Documentation</a></p>
+
 ---
 
 A reusable Convex component for durable transactional email intent and Cloudflare
@@ -36,14 +34,60 @@ from a pinned ezyyeah revision recorded in [UPSTREAM.md](UPSTREAM.md).
 Published on npm as
 [@fantastic.dev/convex-cf-email-service](https://www.npmjs.com/package/@fantastic.dev/convex-cf-email-service).
 
-Install it in your existing Convex app:
+## Quick start
+
+### Have my agent set this up
+
+Copy this into your coding agent in your existing Convex application:
+
+```text
+Set up @fantastic.dev/convex-cf-email-service in this existing Convex app using:
+https://github.com/FantasticDevHQ/convex-cf-email-service
+https://github.com/FantasticDevHQ/convex-cf-email-service/blob/main/docs/architecture.md
+https://github.com/FantasticDevHQ/convex-cf-email-service/blob/main/docs/events.md
+https://github.com/FantasticDevHQ/convex-cf-email-service/blob/main/docs/operations.md
+
+Read applicable AGENTS.md/AGENT.md files. Inspect Git status, package manager,
+lockfile, runtime, existing Convex config and host authorization rules.
+Preserve user changes and architecture. Check the package's Node and Convex
+requirements before installing with this app's package manager.
+
+Follow the README's manual setup: mount the email component, add an internal
+host transport action and enqueue from an authorized host mutation with a stable
+idempotency key and expiry. The component owns scheduling; do not add a second
+retry loop. Keep provider credentials in the host environment, never in the
+component, source, chat or logs. Read the transport and event contracts before
+choosing REST or a Worker binding; do not invent delivery guarantees.
+
+First verify the installed module imports, then run this app's development
+codegen and typecheck. Use the package's /test registration and a fake host
+transport for a local enqueue/status test without sending real email. Report
+installation, host wiring and simulated dispatch separately from live delivery.
+Do not deploy infrastructure, change production or send email without explicit
+user authorization. Explain any remaining Cloudflare account/domain/credential
+steps and report changed files, commands and actual verification results.
+```
+
+### Manual setup
+
+Requires an existing Convex app, Convex 1.44+ and Node 24.22.1+. Run from your
+application root using its existing package manager:
 
 ```sh
 npm install @fantastic.dev/convex-cf-email-service
 ```
 
 With pnpm, use `pnpm add @fantastic.dev/convex-cf-email-service`.
-The package requires Convex 1.44+ and Node 24.19+.
+
+Verify that the installed package loads without contacting Cloudflare:
+
+```sh
+node --input-type=module -e 'await import("@fantastic.dev/convex-cf-email-service"); console.log("Email component loaded")'
+```
+
+Expected result: `Email component loaded`. This checks installation only. The
+following host wiring and development codegen check the integration; use a fake
+transport for local dispatch tests before authorizing any live email.
 
 Mount the component in your host app (`convex/convex.config.ts`):
 
@@ -169,6 +213,8 @@ Consumers needing case-sensitive local parts
 or larger messages should use a separately reviewed extension. All recipients
 are blocked if any is suppressed; the component never silently changes an intent.
 
+## Documentation
+
 See [the transport/state contract](docs/architecture.md),
 [Queue setup and authentication](docs/events.md),
 [multi-mount event ownership routing](docs/multi-mount-routing.md),
@@ -180,7 +226,9 @@ with placeholder configuration and no deployed infrastructure.
 [Email Studio](example/README.md) adds a small Vite UI for real sends and live
 status. Run `pnpm --filter email-host-example dev` after following its host setup.
 
-To work on this repository, use Node 24.19+ and pnpm 11.18. Local tarballs from
+## Development
+
+To work on this repository, use Node 24.22.1+ and pnpm 11.18. Local tarballs from
 `npm pack` are for testing unreleased changes; consumers should install from npm
 using the instructions above.
 
@@ -200,7 +248,7 @@ runs anonymous local codegen/typecheck, exercises a real local host callback and
 event, then tests early/duplicate events and two component mounts with convex-test.
 No Cloudflare credentials or live email send are used in these gates.
 
-[A Fantastic.Dev Project](https://fantastic.dev)
+A [Fantastic.Dev](https://fantastic.dev) Project
 
 [![Fantastic.Dev](https://raw.githubusercontent.com/FantasticDevHQ/convex-worktrees/52c0b76d960a98afedd48607d6737bc14a954c1e/assets/fantastic-dev-logo.svg)](https://fantastic.dev) [![Fantastic.Dev project](https://raw.githubusercontent.com/FantasticDevHQ/convex-worktrees/52c0b76d960a98afedd48607d6737bc14a954c1e/assets/fantastic-dev-badge.svg)](https://fantastic.dev)
 
