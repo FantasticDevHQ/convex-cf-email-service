@@ -6,7 +6,11 @@
 
 <p align="center"><strong>Durable transactional email for Convex, delivered with Cloudflare Email Service.</strong></p>
 
+<div align="center">
+
 [A Fantastic.Dev Project](https://fantastic.dev)
+
+</div>
 
 <p align="center">
   <a href="https://fantastic.dev"><img src="https://img.shields.io/badge/Fantastic.dev-94C173?style=for-the-badge&amp;logoColor=0c0e13" alt="Visit Fantastic.Dev" /></a>
