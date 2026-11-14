@@ -7,3 +7,5 @@ Follow docs/pull-request-standard.md. Use pnpm test:pr-standard and pnpm test:wo
 Use the setup/start/stop/teardown/cleanup/prune package scripts documented in docs/worktrees.md. Editor/agent setup hooks invoke setup; teardown hooks invoke teardown before removing the checkout. Never copy cloud credentials, reset/stash user work, merge to main automatically or kill by port/name. Stop only verified owned processes. Keep toolkit modules/tests under scripts/worktree/ and retain its LICENSE. Test probe fixtures must remain local to disposable integration checkouts.
 
 PR evidence belongs in the PR. State skipped checks and provider/platform limitations honestly. Do not merge automatically.
+
+Verification stays on UbiCloud. The owner-approved npm provenance exception uses GitHub-hosted ubuntu-24.04 for build/publish only.
