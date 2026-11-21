@@ -226,18 +226,22 @@ with placeholder configuration and no deployed infrastructure.
 [Email Studio](example/README.md) adds a small Vite UI for real sends and live
 status. Run `pnpm --filter email-host-example dev` after following its host setup.
 
-## Development
+## Contributing
 
-To work on this repository, use Node 24.22.1+ and pnpm 11.18. Local tarballs from
-`npm pack` are for testing unreleased changes; consumers should install from npm
-using the instructions above.
+Contributions are welcome. Read the
+[contributing guide](https://github.com/FantasticDevHQ/.github/blob/main/CONTRIBUTING.md)
+and [Code of Conduct](https://github.com/FantasticDevHQ/.github/blob/main/CODE_OF_CONDUCT.md),
+and report vulnerabilities privately as described in the
+[security policy](https://github.com/FantasticDevHQ/.github/blob/main/SECURITY.md).
 
-Development:
+Source development needs Node.js 24.22.1 or later (pinned in `.nvmrc`) and pnpm 11.18.0
+(pinned in `package.json`). Local tarballs from `npm pack` are for testing unreleased
+changes; consumers should install from npm using the instructions above.
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm run check
-pnpm run check:consumer
+pnpm run check            # build, typecheck, tests, package, README and codegen gates
+pnpm run check:consumer   # installs the packed tarball in an isolated consumer app
 ```
 
 `check` builds and typechecks the package/examples, runs fault tests and release
@@ -248,8 +252,14 @@ runs anonymous local codegen/typecheck, exercises a real local host callback and
 event, then tests early/duplicate events and two component mounts with convex-test.
 No Cloudflare credentials or live email send are used in these gates.
 
+See [local worktrees](docs/worktrees.md) for the worktree workflow. Pull requests
+follow the [PR standard](docs/pull-request-standard.md).
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) and
+[UPSTREAM.md](UPSTREAM.md) for upstream attribution.
+
 A [Fantastic.Dev](https://fantastic.dev) Project
 
 [![Fantastic.Dev](https://raw.githubusercontent.com/FantasticDevHQ/convex-worktrees/52c0b76d960a98afedd48607d6737bc14a954c1e/assets/fantastic-dev-logo.svg)](https://fantastic.dev) [![Fantastic.Dev project](https://raw.githubusercontent.com/FantasticDevHQ/convex-worktrees/52c0b76d960a98afedd48607d6737bc14a954c1e/assets/fantastic-dev-badge.svg)](https://fantastic.dev)
-
-See [local worktrees](docs/worktrees.md) and [pull request standards](docs/pull-request-standard.md).
