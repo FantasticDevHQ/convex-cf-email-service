@@ -22,6 +22,16 @@ trigger another workflow. Manually pushed v* tags use the same publisher only wh
 the release job was skipped, avoiding the second publisher path. Workflow
 concurrency serializes releases. Never merge a release PR during this task.
 
+Release PRs meet the PR standard like any other PR; the validator has no bot
+exemption. Whenever Release Please creates or updates the release PR,
+`scripts/release-pr-standard.mjs` amends the release commit so its body ends with
+`No-ticket: automated release` (skipped when already present), force-pushes it
+with a lease using the release App token so CI runs on the new head, and appends
+the required sections, with the workflow run as evidence and agent identity,
+after Release Please's generated body. The generated notes, their standalone
+`---` delimiters and the footer stay unchanged, so Release Please still
+recognizes the merged PR.
+
 Before publication the workflow checks package/tag agreement, exact changelog
 version, npm >=11.5.1, frozen install, package build/typecheck/fault tests, examples,
 README sample compilation, pack/licensing/exports checks, fresh isolated codegen
