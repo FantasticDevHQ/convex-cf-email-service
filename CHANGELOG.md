@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.3](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.6.2...v0.6.3) (2026-11-21)
+
+
+### Documentation
+
+* **community:** adopt organization community health defaults ([#32](https://github.com/FantasticDevHQ/convex-cf-email-service/issues/32)) ([dd1390e](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/dd1390eb7f561491dfab690b252555aa754964a2))
+
+
+### Continuous Integration
+
+* **release:** OSS-43 make release PRs meet the PR standard ([#35](https://github.com/FantasticDevHQ/convex-cf-email-service/issues/35)) ([a0adf5a](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/a0adf5af2a3a5aeeaa31a7d132e91c13a0f0e1f7))
+* **standards:** add the issue standard workflow ([#34](https://github.com/FantasticDevHQ/convex-cf-email-service/issues/34)) ([6f11613](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/6f11613a12e3e95090c4c91ead42f4c03d1bc135))
+* **standards:** add the PR standard re-run workflow ([#36](https://github.com/FantasticDevHQ/convex-cf-email-service/issues/36)) ([f79a2b5](https://github.com/FantasticDevHQ/convex-cf-email-service/commit/f79a2b5ed271d6d8f4669ad623ac205eff2c0fba))
+
 ## [0.6.2](https://github.com/FantasticDevHQ/convex-cf-email-service/compare/v0.6.1...v0.6.2) (2026-11-01)
 
 
